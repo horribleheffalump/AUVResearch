@@ -117,7 +117,9 @@ class testenvironment():
             bndX = [np.min(np.hstack((bn1_X, bndX[0]))), np.max(np.hstack((bn1_X, bndX[1])))]
             bndY = [np.min(np.hstack((bn1_Y, bndY[0]))), np.max(np.hstack((bn1_Y, bndY[1])))]
         
+        print('')
         self.auv.step()
+        print('')
 
         for i, s in enumerate(self.auv.Sensors):
             bn, _, _, _, _ = s.beamnet(self.auv.X)
@@ -126,6 +128,8 @@ class testenvironment():
             _ = ax.scatter(bn2_X, bn2_Y, bn2_Z, color = self.colors[i], s = 30)
             bndX = [np.min(np.hstack((bn2_X, bndX[0]))), np.max(np.hstack((bn2_X, bndX[1])))]
             bndY = [np.min(np.hstack((bn2_Y, bndY[0]))), np.max(np.hstack((bn2_Y, bndY[1])))]
+
+        print('')
 
         X = np.arange(bndX[0], bndX[1], (bndX[1] - bndX[0])/ 100.0)
         Y = np.arange(bndY[0], bndY[1], (bndY[1] - bndY[0])/ 100.0)
