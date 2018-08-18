@@ -11,7 +11,7 @@ from SlopeApproximator import *
 #X0 = [0.001,-0.0002,13.0003]
 #V = lambda t: np.array([1.0 + 0.2 * np.cos(1.0 * t), np.cos(0.1 * t), 0.1 * np.sin(2.0 * t)])
 
-T = 60.0
+T = 6.0
 delta = 0.1
 NBeams = 10
 accuracy = [0.0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
@@ -71,6 +71,6 @@ V = lambda t: np.array([1.0 + 0.2 * np.cos(1.0 * t), np.cos(0.1 * t), 0.1 * np.s
 
 test = testenvironment(T, delta, NBeams, accuracy, PhiBounds, ThetaBounds, X0, V)
 
-test.showradar()
-#test.plottrajectory('D:\\projects.git\\NavigationResearch\\results\\')
+#test.showradar()
+test.plottrajectory('D:\\projects.git\\NavigationResearch\\results\\')
 #test.plotseabedsequence('D:\\projects.git\\NavigationResearch\\results\\')

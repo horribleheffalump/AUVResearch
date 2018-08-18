@@ -30,8 +30,9 @@ class testenvironment():
             self.auv.step()
             print(self.delta * i)
     def plottrajectory(self, path):
+        start = datetime.datetime.now()
         self.run()
-        now = datetime.datetime.now()
+        finish = datetime.datetime.now()
         f = plt.figure(num=None, figsize=(5,5), dpi=200, facecolor='w', edgecolor='k')
         for k in range(0,3):
             f = plt.figure(num=None, figsize=(5,5), dpi=200, facecolor='w', edgecolor='k')
@@ -40,21 +41,22 @@ class testenvironment():
                 plt.plot(self.auv.t_history, s.X_estimate_history[:,k], color=self.colors[i], label=str(i))
             plt.plot(self.auv.t_history, self.auv.X_estimate_history[:,k], color='blue')
             plt.legend()
-            plt.savefig(path + now.strftime(str(k) + "___%Y-%m-%d %H-%M-%S-%f")+'.jpg')
+            plt.savefig(path + finish.strftime(str(k) + "___%Y-%m-%d %H-%M-%S-%f")+'.jpg')
         with open(path + "results.txt", "a") as myfile:
             myfile.write(
-                now.strftime("%Y-%m-%d %H-%M-%S") + " " + 
+                finish.strftime("%Y-%m-%d %H-%M-%S") + " " + 
                 str(self.T) + " " + 
                 str(self.delta) + " " + 
                 str(self.NBeams) + " " + 
-                np.array2string(
-                    np.mean(list(map(lambda x: x.X_estimate_history[self.Npoints-1,:] - self.auv.X_history[self.Npoints-1,:], self.auv.Sensors)), axis=0), 
-                    formatter={'float_kind':lambda x: "%.5f" % x}
-                    ) + " " +
+                #np.array2string(
+                #    np.mean(list(map(lambda x: x.X_estimate_history[self.Npoints-1,:] - self.auv.X_history[self.Npoints-1,:], self.auv.Sensors)), axis=0), 
+                #    formatter={'float_kind':lambda x: "%.5f" % x}
+                #    ) + " " +
                 np.array2string(
                     self.auv.X_estimate_history[self.Npoints-1,:] - self.auv.X_history[self.Npoints-1,:], 
                     formatter={'float_kind':lambda x: "%.5f" % x}
                     ) + " " +
+                "elapsed seconds: " + str((finish-start).total_seconds()) + " " +
                 "\n"
                 )
     #def plotseabedsequence(self, path):
