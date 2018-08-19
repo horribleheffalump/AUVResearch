@@ -12,10 +12,10 @@ class Seabed():
     def z(x,y):
         return -20 - 0.3 * np.sin(2.5 * x) - 0.3 * np.sin(2.5 * y) + 0.001 * y ** 2 + 0.001 * x ** 2
         #return -20 - 2.0 * x - 3.0 * y + 4.0 * x * y + 5.0 * x ** 2 + 6.0  * y ** 2
-    def Z(X):
-        return np.reshape(-20 - 0.3 * np.sin(2.5 * X[:,0]) - 0.3 * np.sin(2.5 * X[:,1]) + 0.001 * X[:,0] ** 2 + 0.001 * X[:,1] ** 2, (X.shape[0], 1))
-        #return -20 - 2.0 * X[:,0] - 3.0 * X[:,1] + 4.0 * X[:,0] * X[:,1] + 5.0 * X[:,0] ** 2 + 6.0 * X[:,1] ** 2
-    def ZZ(X,Y):
+    #def Z(X):
+    #    return np.reshape(-20 - 0.3 * np.sin(2.5 * X[:,0]) - 0.3 * np.sin(2.5 * X[:,1]) + 0.001 * X[:,0] ** 2 + 0.001 * X[:,1] ** 2, (X.shape[0], 1))
+    #    #return -20 - 2.0 * X[:,0] - 3.0 * X[:,1] + 4.0 * X[:,0] * X[:,1] + 5.0 * X[:,0] ** 2 + 6.0 * X[:,1] ** 2
+    def Z(X,Y):
         return -20 - 0.3 * np.sin(2.5 * X) - 0.3 * np.sin(2.5 * Y) + 0.001 * X ** 2 + 0.001 * Y ** 2
         #return -20 - 2.0 * X - 3.0 * Y + 4.0 * np.multiply(X, Y) + 5.0 * X ** 2 + 6.0 * Y ** 2
     def dzdx(x,y):
@@ -27,4 +27,6 @@ class Seabed():
     def dz(x, y):
         return Seabed.dzdx(x,y), Seabed.dzdy(x,y)
     def dZ(X):
-        return np.reshape(-0.3 * 2.5 * np.cos(2.5 * X[:,0]) + 2.0 * 0.001 * X[:,0], (X.shape[0], 1)), np.reshape(-0.3 * 2.5 * np.cos(2.5 * X[:,1]) + 2.0 * 0.001 * X[:,1], (X.shape[0], 1))
+        dzdx = -0.3 * 2.5 * np.cos(2.5 * X[:,0]) + 2.0 * 0.001 * X[:,0]
+        dzdy = -0.3 * 2.5 * np.cos(2.5 * X[:,1]) + 2.0 * 0.001 * X[:,1]
+        return dzdx, dzdy

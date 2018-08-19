@@ -19,8 +19,8 @@ class AUV():
         self.Sensors.append(Sensor(self.X, accuracy, Phi, Theta))
     def step(self):
         for s in self.Sensors:
-            s.stepvec(self.X)
-        self.X = self.X + self.delta * self.V(self.t) #+ np.sqrt(0.1 * self.delta) * np.random.normal(0,1,3)
+            s.step(self.X)
+        self.X = self.X + self.delta * self.V(self.t) + np.sqrt(0.1 * self.delta) * np.random.normal(0,1,3)
         self.t = self.t + self.delta
         
         self.X_history = np.vstack((self.X_history, self.X))
