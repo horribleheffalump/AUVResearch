@@ -6,7 +6,7 @@ from SlopeApproximator import *
 
 class Sensor():
     """Acoustic sensor model"""
-    def __init__(self, Xhat0, accuracy, Phi, Theta):
+    def __init__(self, Xhat0, accuracy, Phi, Theta, estimateslope = True):
         self.accuracy = accuracy
         self.X_estimate = np.array(Xhat0)
         self.X_estimate_history = Xhat0      
@@ -14,6 +14,7 @@ class Sensor():
         self.L_current = np.zeros(Phi.size * Theta.size)
         self.Phi = np.array(Phi)
         self.Theta = np.array(Theta)
+        self.estimateslope = estimateslope
         #self.L_net_previous = np.zeros((self.Phi.size, self.Theta.size))
         #self.L_net_current = np.zeros((self.Phi.size, self.Theta.size))
         #self.dzdx_current = np.zeros((self.Phi.size, self.Theta.size))
@@ -28,7 +29,8 @@ class Sensor():
         #    for j in range(Theta.size):
         #        self.e[i*Phi.size  + j] = self.__e(Phi[i], Theta[j])
 
-        self.sa = SlopeApproximator()
+        if (estimateslope):
+            self.sa = SlopeApproximator()
 
 
     def __e(self, phi, theta):
@@ -94,12 +96,14 @@ class Sensor():
         L = self.__l(X)
         R = X + np.reshape(L, (L.size, 1)) * self.e
         
-        # exact slope
-        #dZdx, dZdy = Seabed.dZ(RR)
+        if self.estimateslope:
+            # slope approximation
+            self.sa.predict(R[:,0:2], R[:,2])
+            dZdx, dZdy = self.sa.partialdiffs(R[:,0:2])
+        else:
+            # exact slope
+            dZdx, dZdy = Seabed.dZ(R)
 
-        # slope approximation
-        self.sa.predict(R[:,0:2], R[:,2])
-        dZdx, dZdy = self.sa.partialdiffs(R[:,0:2])
 
 
         M = dZdx * self.e[:,0] + dZdy * self.e[:,1] - self.e[:,2]  

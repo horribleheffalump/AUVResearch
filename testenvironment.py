@@ -9,7 +9,7 @@ import datetime
 
 class testenvironment():
     """AUV model"""
-    def __init__(self, T, delta, NBeams, accuracy, PhiBounds, ThetaBounds, X0, V):
+    def __init__(self, T, delta, NBeams, accuracy, PhiBounds, ThetaBounds, X0, V, estimateslope):
         self.T = T
         self.delta = delta
         self.Npoints = int(T / delta)
@@ -23,7 +23,7 @@ class testenvironment():
             th = self.ThetaBounds[i,:]
             PhiGrad     = np.append(np.arange(ph[0], ph[1], (ph[1] - ph[0])/self.NBeams), ph[1])
             ThetaGrad   = np.append(np.arange(th[0], th[1], (th[1] - th[0])/self.NBeams), th[1])
-            self.auv.addsensor(accuracy[i], PhiGrad / 180.0 * np.pi, ThetaGrad / 180.0 * np.pi)
+            self.auv.addsensor(accuracy[i], PhiGrad / 180.0 * np.pi, ThetaGrad / 180.0 * np.pi, estimateslope)
         self.colors = ['lavenderblush', 'pink', 'plum', 'palevioletred', 'mediumvioletred', 'mediumorchid', 'darkorchid', 'purple']
     def run(self):
         for i in range(0, self.Npoints):
@@ -33,15 +33,19 @@ class testenvironment():
         start = datetime.datetime.now()
         self.run()
         finish = datetime.datetime.now()
-        f = plt.figure(num=None, figsize=(5,5), dpi=200, facecolor='w', edgecolor='k')
+        f = plt.figure(num=None, figsize=(15,5), dpi=200, facecolor='w', edgecolor='k')
+        gs = gridspec.GridSpec(1, 3, width_ratios=[1, 1, 1])     
+        gs.update(left=0.03, bottom=0.05, right=0.99, top=0.99, wspace=0.1, hspace=0.1)    
+
         for k in range(0,3):
-            f = plt.figure(num=None, figsize=(5,5), dpi=200, facecolor='w', edgecolor='k')
-            plt.plot(self.auv.t_history, self.auv.X_history[:,k], color='black')
+            #f = plt.figure(num=None, figsize=(5,5), dpi=200, facecolor='w', edgecolor='k')
+            ax = plt.subplot(gs[k])
+            ax.plot(self.auv.t_history, self.auv.X_history[:,k], color='black')
             for i,s in enumerate(self.auv.Sensors):
-                plt.plot(self.auv.t_history, s.X_estimate_history[:,k], color=self.colors[i], label=str(i))
-            plt.plot(self.auv.t_history, self.auv.X_estimate_history[:,k], color='blue')
-            plt.legend()
-            plt.savefig(path + finish.strftime(str(k) + "___%Y-%m-%d %H-%M-%S-%f")+'.jpg')
+                ax.plot(self.auv.t_history, s.X_estimate_history[:,k], color=self.colors[i], label=str(i))
+            ax.plot(self.auv.t_history, self.auv.X_estimate_history[:,k], color='blue')
+            ax.legend()
+        plt.savefig(path + finish.strftime("%Y-%m-%d %H-%M-%S-%f")+'.jpg')
         with open(path + "results.txt", "a") as myfile:
             myfile.write(
                 finish.strftime("%Y-%m-%d %H-%M-%S") + " " + 
