@@ -9,7 +9,7 @@ import datetime
 
 class testenvironment():
     """AUV model"""
-    def __init__(self, T, delta, NBeams, accuracy, PhiBounds, ThetaBounds, X0, V, estimateslope):
+    def __init__(self, T, delta, NBeams, accuracy, PhiBounds, ThetaBounds, X0, V, seabed, estimateslope):
         self.T = T
         self.delta = delta
         self.Npoints = int(T / delta)
@@ -18,12 +18,13 @@ class testenvironment():
         self.PhiBounds = np.array(PhiBounds)
         self.ThetaBounds = np.array(ThetaBounds)
         self.auv = AUV(X0, V, delta)
+        self.seabed = seabed;
         for i in range(0, self.accuracy.size):
             ph = self.PhiBounds[i,:]
             th = self.ThetaBounds[i,:]
             PhiGrad     = np.append(np.arange(ph[0], ph[1], (ph[1] - ph[0])/self.NBeams), ph[1])
             ThetaGrad   = np.append(np.arange(th[0], th[1], (th[1] - th[0])/self.NBeams), th[1])
-            self.auv.addsensor(accuracy[i], PhiGrad / 180.0 * np.pi, ThetaGrad / 180.0 * np.pi, estimateslope)
+            self.auv.addsensor(accuracy[i], PhiGrad / 180.0 * np.pi, ThetaGrad / 180.0 * np.pi, seabed, estimateslope)
         self.colors = ['lavenderblush', 'pink', 'plum', 'palevioletred', 'mediumvioletred', 'mediumorchid', 'darkorchid', 'purple']
     def run(self):
         for i in range(0, self.Npoints):
@@ -117,8 +118,9 @@ class testenvironment():
 
         for s in self.auv.Sensors:
             bn, _, _, _, _ = s.beamnet(self.auv.X)
-            bn_plain = np.reshape(bn, (bn.size,1))
-            bn1_X, bn1_Y, bn1_Z = np.array([p[0][0] for p in bn_plain]), np.array([p[0][1] for p in bn_plain]), np.array([p[0][2] for p in bn_plain])
+            bn1_X, bn1_Y, bn1_Z = bn[:,0], bn[:,1], bn[:,2]
+            #bn_plain = np.reshape(bn, (bn.size,1))
+            #bn1_X, bn1_Y, bn1_Z = np.array([p[0][0] for p in bn_plain]), np.array([p[0][1] for p in bn_plain]), np.array([p[0][2] for p in bn_plain])
             #_ = ax.scatter(bn1_X, bn1_Y, bn1_Z, color = 'black', s = 30)
             bndX = [np.min(np.hstack((bn1_X, bndX[0]))), np.max(np.hstack((bn1_X, bndX[1])))]
             bndY = [np.min(np.hstack((bn1_Y, bndY[0]))), np.max(np.hstack((bn1_Y, bndY[1])))]
@@ -129,8 +131,9 @@ class testenvironment():
 
         for i, s in enumerate(self.auv.Sensors):
             bn, _, _, _, _ = s.beamnet(self.auv.X)
-            bn_plain = np.reshape(bn, (bn.size,1))
-            bn2_X, bn2_Y, bn2_Z = np.array([p[0][0] for p in bn_plain]), np.array([p[0][1] for p in bn_plain]), np.array([p[0][2] for p in bn_plain])
+            bn2_X, bn2_Y, bn2_Z = bn[:,0], bn[:,1], bn[:,2]
+            #bn_plain = np.reshape(bn, (bn.size,1))
+            #bn2_X, bn2_Y, bn2_Z = np.array([p[0][0] for p in bn_plain]), np.array([p[0][1] for p in bn_plain]), np.array([p[0][2] for p in bn_plain])
             _ = ax.scatter(bn2_X, bn2_Y, bn2_Z, color = self.colors[i], s = 30)
             bndX = [np.min(np.hstack((bn2_X, bndX[0]))), np.max(np.hstack((bn2_X, bndX[1])))]
             bndY = [np.min(np.hstack((bn2_Y, bndY[0]))), np.max(np.hstack((bn2_Y, bndY[1])))]
@@ -140,12 +143,12 @@ class testenvironment():
         X = np.arange(bndX[0], bndX[1], (bndX[1] - bndX[0])/ 100.0)
         Y = np.arange(bndY[0], bndY[1], (bndY[1] - bndY[0])/ 100.0)
         X, Y = np.meshgrid(X, Y)
-        Z = Seabed.z(X,Y)
+        Z = self.seabed.Z(X,Y)
 
         _ = ax.scatter(self.auv.X[0], self.auv.X[1], self.auv.X[2], color = 'red', s = 100)
 
         # Plot the surface.
-        #surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm, linewidth=0, antialiased=False, alpha=0.3)
+        surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm, linewidth=0, antialiased=False, alpha=0.3)
 
         ax.zaxis.set_major_locator(LinearLocator(10))
         ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))

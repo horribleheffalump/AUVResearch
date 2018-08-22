@@ -6,7 +6,7 @@ from SlopeApproximator import *
 
 class Sensor():
     """Acoustic sensor model"""
-    def __init__(self, Xhat0, accuracy, Phi, Theta, estimateslope = True):
+    def __init__(self, Xhat0, accuracy, Phi, Theta, seabed, estimateslope = True):
         self.accuracy = accuracy
         self.X_estimate = np.array(Xhat0)
         self.X_estimate_history = Xhat0      
@@ -14,6 +14,7 @@ class Sensor():
         self.L_current = np.zeros(Phi.size * Theta.size)
         self.Phi = np.array(Phi)
         self.Theta = np.array(Theta)
+        self.seabed = seabed
         self.estimateslope = estimateslope
         #self.L_net_previous = np.zeros((self.Phi.size, self.Theta.size))
         #self.L_net_current = np.zeros((self.Phi.size, self.Theta.size))
@@ -43,7 +44,7 @@ class Sensor():
     #    self.L_current = fsolve(func, self.L_current)
     #    return self.L_current + np.random.normal(0,self.accuracy)
     def __l(self, X):
-        func = lambda l : Seabed.Z(X[0] + l * self.e[:,0], X[1] + l * self.e[:,1]) - (X[2] + l * self.e[:,2])
+        func = lambda l : self.seabed.Z(X[0] + l * self.e[:,0], X[1] + l * self.e[:,1]) - (X[2] + l * self.e[:,2])
         l_vec = fsolve(func, self.L_current)
         return l_vec + np.random.normal(0, self.accuracy, l_vec.size)
     def __beamcoords(self, X, e, L):
@@ -102,7 +103,7 @@ class Sensor():
             dZdx, dZdy = self.sa.partialdiffs(R[:,0:2])
         else:
             # exact slope
-            dZdx, dZdy = Seabed.dZ(R)
+            dZdx, dZdy = self.seabed.dZ(R[:,0], R[:,1])
 
 
 

@@ -15,8 +15,8 @@ class AUV():
         self.X_estimate_history = self.X
         self.t_history = self.t
         self.Sensors = []
-    def addsensor(self, accuracy, Phi, Theta, estimateslope):      
-        self.Sensors.append(Sensor(self.X, accuracy, Phi, Theta, estimateslope))
+    def addsensor(self, accuracy, Phi, Theta, seabed, estimateslope):      
+        self.Sensors.append(Sensor(self.X, accuracy, Phi, Theta, seabed, estimateslope))
     def step(self):
         for s in self.Sensors:
             s.step(self.X)
