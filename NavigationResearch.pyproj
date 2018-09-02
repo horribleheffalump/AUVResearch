@@ -26,9 +26,6 @@
     <Compile Include="AUV.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="main.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Sensor.py">
       <SubType>Code</SubType>
     </Compile>
@@ -38,16 +35,10 @@
     <Compile Include="testenvironment.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="plotseabed.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="runtest.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Seabed.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="seabedsequence.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

@@ -64,50 +64,56 @@ class testenvironment():
                 "elapsed seconds: " + str((finish-start).total_seconds()) + " " +
                 "\n"
                 )
-    #def plotseabedsequence(self, path):
-    #    fig = plt.figure(figsize=(10, 6), dpi=200)
-    #    ax = fig.gca(projection='3d')
-    #    ax.view_init(50, 30)
+    def plotseabedsequence(self, path, withestimates):
+        for t in range(0, self.Npoints):
+            print(self.delta * t)
+            self.auv.step()
 
-    #    bn, _, _, _, _ = self.auv.beamnet()
-    #    bn_plain = np.reshape(bn, (bn.size,1))
-    #    bn1_X, bn1_Y, bn1_Z = np.array([p[0][0] for p in bn_plain]), np.array([p[0][1] for p in bn_plain]), np.array([p[0][2] for p in bn_plain])
+            fig = plt.figure(figsize=(10, 6), dpi=200)
+            gs = gridspec.GridSpec(3, 2, width_ratios=[3, 1], height_ratios=[1, 1, 1])     
+            gs.update(left=0.03, bottom=0.05, right=0.99, top=0.99, wspace=0.1, hspace=0.1)    
+
+            if withestimates:
+                ax = fig.add_subplot(gs[:,0], projection='3d')
+                for k in range(0,3):
+                    axp = fig.add_subplot(gs[k,1])
+                    axp.plot(self.auv.t_history, self.auv.X_history[:,k], color='black')
+                    for i,s in enumerate(self.auv.Sensors):
+                        axp.plot(self.auv.t_history, s.X_estimate_history[:,k], color=self.colors[i], label=str(i))
+                    axp.plot(self.auv.t_history, self.auv.X_estimate_history[:,k], color='blue')
+            else:
+                ax = fig.add_subplot(gs[:], projection='3d')
+
+            ax.view_init(30, 30)
 
 
-    #    for i in range(0, self.Npoints):
-    #        print(self.delta * i)
-    #        self.auv.step()
-    #        scatter1 = ax.scatter(bn1_X, bn1_Y, bn1_Z, color = 'black', s = 30)
 
-    #        bn, _, _, _, _ = self.auv.beamnet()
-    #        bn_plain = np.reshape(bn, (bn.size,1))
-    #        bn2_X, bn2_Y, bn2_Z = np.array([p[0][0] for p in bn_plain]), np.array([p[0][1] for p in bn_plain]), np.array([p[0][2] for p in bn_plain])
-    #        scatter2 = ax.scatter(bn2_X, bn2_Y, bn2_Z, color = 'blue', s = 30)
+            bndX = [self.auv.X[0], self.auv.X[0]]
+            bndY = [self.auv.X[1], self.auv.X[1]]
 
-    #        bndX = [np.min([bn1_X, bn2_X]), np.max([bn1_X, bn2_X])]
-    #        bndY = [np.min([bn1_Y, bn2_Y]), np.max([bn1_Y, bn2_Y])]
+            for i, s in enumerate(self.auv.Sensors):
+                bn, _, _, _, _ = s.beamnet(self.auv.X)
+                bn_X, bn_Y, bn_Z = bn[:,0], bn[:,1], bn[:,2]
+                _ = ax.scatter(bn_X, bn_Y, bn_Z, color = self.colors[i], s = 30)
+                bndX = [np.min(np.hstack((bn_X, bndX[0]))), np.max(np.hstack((bn_X, bndX[1])))]
+                bndY = [np.min(np.hstack((bn_Y, bndY[0]))), np.max(np.hstack((bn_Y, bndY[1])))]
 
-    #        X = np.arange(bndX[0], bndX[1], (bndX[1] - bndX[0])/ 100.0)
-    #        Y = np.arange(bndY[0], bndY[1], (bndY[1] - bndY[0])/ 100.0)
-    #        X, Y = np.meshgrid(X, Y)
-    #        Z = Seabed.z(X,Y)
+            X = np.arange(bndX[0], bndX[1], (bndX[1] - bndX[0])/ 100.0)
+            Y = np.arange(bndY[0], bndY[1], (bndY[1] - bndY[0])/ 100.0)
+            X, Y = np.meshgrid(X, Y)
+            Z = self.seabed.Z(X,Y)
 
-    #        # Plot the surface.
-    #        surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm,
-    #                               linewidth=0, antialiased=False, alpha=0.3)
+            _ = ax.scatter(self.auv.X[0], self.auv.X[1], self.auv.X[2], color = 'red', s = 100)
+    
+            # Plot the surface.
+            surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm, linewidth=0, antialiased=False, alpha=0.3)
 
-    #        ax.zaxis.set_major_locator(LinearLocator(10))
-    #        ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
+            ax.zaxis.set_major_locator(LinearLocator(10))
+            ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
 
-    #        # Add a color bar which maps values to colors.
-    #        fig.colorbar(surf, shrink=0.5, aspect=5)
-    #        plt.savefig(path + '\\' + str(i) + '.jpg')
+            #fig.colorbar(surf, shrink=0.5, aspect=5)
+            plt.savefig(path + '\\' + str(t) + '.jpg')
 
-    #        bn1_X, bn1_Y, bn1_Z = bn2_X, bn2_Y, bn2_Z 
-   
-    #        fig = plt.figure(figsize=(10, 6), dpi=200)
-    #        ax = fig.gca(projection='3d')
-    #        ax.view_init(50, 30)
     def showradar(self):
         fig = plt.figure(figsize=(10, 6), dpi=200)
         ax = fig.gca(projection='3d')
@@ -119,9 +125,7 @@ class testenvironment():
         for s in self.auv.Sensors:
             bn, _, _, _, _ = s.beamnet(self.auv.X)
             bn1_X, bn1_Y, bn1_Z = bn[:,0], bn[:,1], bn[:,2]
-            #bn_plain = np.reshape(bn, (bn.size,1))
-            #bn1_X, bn1_Y, bn1_Z = np.array([p[0][0] for p in bn_plain]), np.array([p[0][1] for p in bn_plain]), np.array([p[0][2] for p in bn_plain])
-            #_ = ax.scatter(bn1_X, bn1_Y, bn1_Z, color = 'black', s = 30)
+            _ = ax.scatter(bn1_X, bn1_Y, bn1_Z, color = 'black', s = 10)
             bndX = [np.min(np.hstack((bn1_X, bndX[0]))), np.max(np.hstack((bn1_X, bndX[1])))]
             bndY = [np.min(np.hstack((bn1_Y, bndY[0]))), np.max(np.hstack((bn1_Y, bndY[1])))]
         
@@ -132,8 +136,6 @@ class testenvironment():
         for i, s in enumerate(self.auv.Sensors):
             bn, _, _, _, _ = s.beamnet(self.auv.X)
             bn2_X, bn2_Y, bn2_Z = bn[:,0], bn[:,1], bn[:,2]
-            #bn_plain = np.reshape(bn, (bn.size,1))
-            #bn2_X, bn2_Y, bn2_Z = np.array([p[0][0] for p in bn_plain]), np.array([p[0][1] for p in bn_plain]), np.array([p[0][2] for p in bn_plain])
             _ = ax.scatter(bn2_X, bn2_Y, bn2_Z, color = self.colors[i], s = 30)
             bndX = [np.min(np.hstack((bn2_X, bndX[0]))), np.max(np.hstack((bn2_X, bndX[1])))]
             bndY = [np.min(np.hstack((bn2_Y, bndY[0]))), np.max(np.hstack((bn2_Y, bndY[1])))]
@@ -146,7 +148,7 @@ class testenvironment():
         Z = self.seabed.Z(X,Y)
 
         _ = ax.scatter(self.auv.X[0], self.auv.X[1], self.auv.X[2], color = 'red', s = 100)
-
+    
         # Plot the surface.
         surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm, linewidth=0, antialiased=False, alpha=0.3)
 

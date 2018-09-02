@@ -81,6 +81,6 @@ seabed = Seabed()
 
 test = testenvironment(T, delta, NBeams, accuracy, PhiBounds, ThetaBounds, X0, V, seabed, estimateslope)
 
-test.showradar()
-test.plottrajectory('D:\\projects.git\\NavigationResearch\\results\\')
-#test.plotseabedsequence('D:\\projects.git\\NavigationResearch\\results\\')
+#test.showradar()
+#test.plottrajectory('D:\\projects.git\\NavigationResearch\\results\\')
+test.plotseabedsequence('C:\\projects.git\\NavigationResearch\\results\\', True)
