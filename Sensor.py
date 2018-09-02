@@ -10,6 +10,8 @@ class Sensor():
         self.accuracy = accuracy
         self.X_estimate = np.array(Xhat0)
         self.X_estimate_history = Xhat0      
+        self.delta_X_estimate = np.array(self.X_estimate.shape) 
+        self.delta_X_estimate_history = np.zeros(Xhat0.shape)      
         #self.L_current = 0.0
         self.L_current = np.zeros(Phi.size * Theta.size)
         self.Phi = np.array(Phi)
@@ -125,9 +127,10 @@ class Sensor():
         reg = lm.Ridge()
         reg.fit(A, B)
         V = reg.predict(np.eye(3))
-
-        self.X_estimate = self.X_estimate + np.reshape(V,(1,V.size)) 
+        self.delta_X_estimate = np.reshape(V,(1,V.size)) 
+        self.X_estimate = self.X_estimate + self.delta_X_estimate 
         self.X_estimate_history = np.vstack((self.X_estimate_history, self.X_estimate))
+        self.delta_X_estimate_history = np.vstack((self.delta_X_estimate_history, self.delta_X_estimate))
 
         self.L_current[:] = L
 

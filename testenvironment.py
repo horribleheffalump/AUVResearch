@@ -64,7 +64,7 @@ class testenvironment():
                 "elapsed seconds: " + str((finish-start).total_seconds()) + " " +
                 "\n"
                 )
-    def plotseabedsequence(self, path, withestimates):
+    def plotseabedsequence(self, path, sideplots):
         for t in range(0, self.Npoints):
             print(self.delta * t)
             self.auv.step()
@@ -73,7 +73,7 @@ class testenvironment():
             gs = gridspec.GridSpec(3, 2, width_ratios=[3, 1], height_ratios=[1, 1, 1])     
             gs.update(left=0.03, bottom=0.05, right=0.99, top=0.99, wspace=0.1, hspace=0.1)    
 
-            if withestimates:
+            if sideplots == 'X':
                 ax = fig.add_subplot(gs[:,0], projection='3d')
                 for k in range(0,3):
                     axp = fig.add_subplot(gs[k,1])
@@ -81,6 +81,14 @@ class testenvironment():
                     for i,s in enumerate(self.auv.Sensors):
                         axp.plot(self.auv.t_history, s.X_estimate_history[:,k], color=self.colors[i], label=str(i))
                     axp.plot(self.auv.t_history, self.auv.X_estimate_history[:,k], color='blue')
+            elif sideplots == 'deltaX':
+                ax = fig.add_subplot(gs[:,0], projection='3d')
+                for k in range(0,3):
+                    axp = fig.add_subplot(gs[k,1])
+                    axp.plot(self.auv.t_history, self.auv.delta_X_history[:,k], color='black')
+                    for i,s in enumerate(self.auv.Sensors):
+                        axp.plot(self.auv.t_history, s.delta_X_estimate_history[:,k], color=self.colors[i], label=str(i))
+                    axp.plot(self.auv.t_history, self.auv.delta_X_estimate_history[:,k], color='blue')
             else:
                 ax = fig.add_subplot(gs[:], projection='3d')
 
@@ -103,7 +111,12 @@ class testenvironment():
             X, Y = np.meshgrid(X, Y)
             Z = self.seabed.Z(X,Y)
 
-            _ = ax.scatter(self.auv.X[0], self.auv.X[1], self.auv.X[2], color = 'red', s = 100)
+            v_scale = 50.0
+            Vplot = np.vstack((self.auv.X, self.auv.X + v_scale * self.delta * self.auv.V(t))) 
+            
+            _ = ax.scatter(Vplot[0,0], Vplot[0,1], Vplot[0,2], color = 'red', s = 100)
+            _ = ax.scatter(Vplot[1,0], Vplot[1,1], Vplot[1,2], color = 'red', s = 10)
+            _ = ax.plot(Vplot[:,0], Vplot[:,1], Vplot[:,2], color = 'red')
     
             # Plot the surface.
             surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm, linewidth=0, antialiased=False, alpha=0.3)

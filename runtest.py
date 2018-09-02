@@ -83,4 +83,4 @@ test = testenvironment(T, delta, NBeams, accuracy, PhiBounds, ThetaBounds, X0, V
 
 #test.showradar()
 #test.plottrajectory('D:\\projects.git\\NavigationResearch\\results\\')
-test.plotseabedsequence('C:\\projects.git\\NavigationResearch\\results\\', True)
+test.plotseabedsequence('C:\\projects.git\\NavigationResearch\\results\\', 'deltaX')
