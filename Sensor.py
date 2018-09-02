@@ -6,14 +6,12 @@ from SlopeApproximator import *
 
 class Sensor():
     """Acoustic sensor model"""
-    def __init__(self, Xhat0, accuracy, Phi, Theta, seabed, estimateslope = True):
+    def __init__(self, X0, Xhat0, accuracy, Phi, Theta, seabed, estimateslope = True):
         self.accuracy = accuracy
         self.X_estimate = np.array(Xhat0)
         self.X_estimate_history = Xhat0      
         self.delta_X_estimate = np.array(self.X_estimate.shape) 
         self.delta_X_estimate_history = np.zeros(Xhat0.shape)      
-        #self.L_current = 0.0
-        self.L_current = np.zeros(Phi.size * Theta.size)
         self.Phi = np.array(Phi)
         self.Theta = np.array(Theta)
         self.seabed = seabed
@@ -34,6 +32,9 @@ class Sensor():
 
         if (estimateslope):
             self.sa = SlopeApproximator()
+
+        self.L_current = np.zeros(Phi.size * Theta.size)
+        _, self.L_current, _, _, _ = self.beamnet(X0)
 
 
     def __e(self, phi, theta):
@@ -107,17 +108,13 @@ class Sensor():
             # exact slope
             dZdx, dZdy = self.seabed.dZ(R[:,0], R[:,1])
 
-
-
         M = dZdx * self.e[:,0] + dZdy * self.e[:,1] - self.e[:,2]  
     
         return R, L, dZdx, dZdy, M
 
     def step(self, X):
         _, L, dZdx, dZdy, M = self.beamnet(X)
-        deltaL = np.zeros(self.L_current.shape)
-        if (self.X_estimate_history.size > X.size): #not the first step
-            deltaL = L - self.L_current
+        deltaL = L - self.L_current
         A = np.transpose(np.vstack((-dZdx, -dZdy, np.ones(dZdx.shape))))
         B = deltaL * M        
         #unregularized least squares solution
