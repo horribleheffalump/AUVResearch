@@ -261,3 +261,5 @@ __pycache__/
 *.pyc
 /results
 /results_short_version
+/runtest2.py
+/runtest1.py

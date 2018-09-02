@@ -30,6 +30,12 @@ class testenvironment():
         for i in range(0, self.Npoints):
             self.auv.step()
             print(self.delta * i)
+    def crit(self):
+        for i in range(0, self.Npoints):
+            self.auv.step()
+        err_cov = np.dot(np.transpose(self.auv.X_history - self.auv.X_estimate_history), (self.auv.X_history - self.auv.X_estimate_history))
+        #print(err_cov)
+        return(np.trace(err_cov))
     def plottrajectory(self, path):
         start = datetime.datetime.now()
         self.run()
