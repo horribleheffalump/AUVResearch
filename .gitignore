@@ -263,3 +263,6 @@ __pycache__/
 /results_short_version
 /runtest2.py
 /runtest1.py
+
+#envs
+.envs/
