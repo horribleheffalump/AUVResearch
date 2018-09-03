@@ -23,6 +23,9 @@
     <InterpreterReference Include="Global|ContinuumAnalytics|Anaconda36-64" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="angles_optimization_power.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="AUV.py">
       <SubType>Code</SubType>
     </Compile>
