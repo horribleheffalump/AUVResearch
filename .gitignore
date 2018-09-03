@@ -266,3 +266,5 @@ __pycache__/
 
 #envs
 .envs/
+/results_crit_conc.txt
+/results_concurrent.txt
