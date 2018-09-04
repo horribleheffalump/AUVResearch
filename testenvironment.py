@@ -10,6 +10,7 @@ import datetime
 class testenvironment():
     """AUV model"""
     def __init__(self, T, delta, NBeams, accuracy, PhiBounds, ThetaBounds, X0, V, seabed, estimateslope):
+
         self.T = T
         self.delta = delta
         self.Npoints = int(T / delta)
@@ -25,7 +26,8 @@ class testenvironment():
             PhiGrad     = np.append(np.arange(ph[0], ph[1], (ph[1] - ph[0])/self.NBeams), ph[1])
             ThetaGrad   = np.append(np.arange(th[0], th[1], (th[1] - th[0])/self.NBeams), th[1])
             self.auv.addsensor(accuracy[i], PhiGrad / 180.0 * np.pi, ThetaGrad / 180.0 * np.pi, seabed, estimateslope)
-        self.colors = ['lavenderblush', 'pink', 'plum', 'palevioletred', 'mediumvioletred', 'mediumorchid', 'darkorchid', 'purple']
+        #self.colors = ['lavenderblush', 'pink', 'plum', 'palevioletred', 'mediumvioletred', 'mediumorchid', 'darkorchid', 'purple']
+        self.colors = ['red', 'green', 'blue', 'cyan', 'pink', 'yellow', 'orange', 'purple']
     def run(self):
         for i in range(0, self.Npoints):
             self.auv.step()
@@ -47,10 +49,10 @@ class testenvironment():
         for k in range(0,3):
             #f = plt.figure(num=None, figsize=(5,5), dpi=200, facecolor='w', edgecolor='k')
             ax = plt.subplot(gs[k])
-            ax.plot(self.auv.t_history, self.auv.X_history[:,k], color='black')
+            ax.plot(self.auv.t_history, self.auv.X_history[:,k], color='black', linewidth=2.0, linestyle='dash')
             for i,s in enumerate(self.auv.Sensors):
                 ax.plot(self.auv.t_history, s.X_estimate_history[:,k], color=self.colors[i], label=str(i))
-            ax.plot(self.auv.t_history, self.auv.X_estimate_history[:,k], color='blue')
+            ax.plot(self.auv.t_history, self.auv.X_estimate_history[:,k], color='black', linewidth=2.0)
             ax.legend()
         plt.savefig(path + finish.strftime("%Y-%m-%d %H-%M-%S-%f")+'.jpg')
         with open(path + "results.txt", "a") as myfile:
@@ -85,30 +87,30 @@ class testenvironment():
                     axp = fig.add_subplot(gs[k,1])
                     for i,s in enumerate(self.auv.Sensors):
                         axp.plot(self.auv.t_history, s.delta_X_estimate_history[:,k], color=self.colors[i], label=str(i))
-                    axp.plot(self.auv.t_history, self.auv.delta_X_estimate_history[:,k], color='blue')
-                    axp.plot(self.auv.t_history, self.auv.delta_X_history[:,k], color='black')
+                    axp.plot(self.auv.t_history, self.auv.delta_X_estimate_history[:,k], color='black', linewidth=2.0)
+                    axp.plot(self.auv.t_history, self.auv.delta_X_history[:,k], color='black', linewidth=2.0, linestyle=':')
                 for k in range(0,3):
                     axp = fig.add_subplot(gs[k,2])
                     for i,s in enumerate(self.auv.Sensors):
                         axp.plot(self.auv.t_history, s.X_estimate_history[:,k], color=self.colors[i], label=str(i))
-                    axp.plot(self.auv.t_history, self.auv.X_estimate_history[:,k], color='blue')
-                    axp.plot(self.auv.t_history, self.auv.X_history[:,k], color='black')
+                    axp.plot(self.auv.t_history, self.auv.X_estimate_history[:,k], color='black', linewidth=2.0)
+                    axp.plot(self.auv.t_history, self.auv.X_history[:,k], color='black', linewidth=2.0, linestyle=':')
             elif sideplots == 'X':
                 ax = fig.add_subplot(gs[:,0:2], projection='3d')
                 for k in range(0,3):
                     axp = fig.add_subplot(gs[k,2])
                     for i,s in enumerate(self.auv.Sensors):
                         axp.plot(self.auv.t_history, s.X_estimate_history[:,k], color=self.colors[i], label=str(i))
-                    axp.plot(self.auv.t_history, self.auv.X_estimate_history[:,k], color='blue')
-                    axp.plot(self.auv.t_history, self.auv.X_history[:,k], color='black')
+                    axp.plot(self.auv.t_history, self.auv.X_estimate_history[:,k], color='black', linewidth=2.0)
+                    axp.plot(self.auv.t_history, self.auv.X_history[:,k], color='black', linewidth=2.0, linestyle=':')
             elif sideplots == 'deltaX':
                 ax = fig.add_subplot(gs[:,0:2], projection='3d')
                 for k in range(0,3):
                     axp = fig.add_subplot(gs[k,2])
                     for i,s in enumerate(self.auv.Sensors):
                         axp.plot(self.auv.t_history, s.delta_X_estimate_history[:,k], color=self.colors[i], label=str(i))
-                    axp.plot(self.auv.t_history, self.auv.delta_X_estimate_history[:,k], color='blue')
-                    axp.plot(self.auv.t_history, self.auv.delta_X_history[:,k], color='black')
+                    axp.plot(self.auv.t_history, self.auv.delta_X_estimate_history[:,k], color='black', linewidth=2.0)
+                    axp.plot(self.auv.t_history, self.auv.delta_X_history[:,k], color='black', linewidth=2.0, linestyle=':')
             else:
                 ax = fig.add_subplot(gs[:], projection='3d')
 
