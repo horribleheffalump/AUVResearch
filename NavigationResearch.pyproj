@@ -35,6 +35,9 @@
     <Compile Include="SlopeApproximator.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="stats.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="testenvironment.py">
       <SubType>Code</SubType>
     </Compile>

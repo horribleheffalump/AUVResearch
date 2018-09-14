@@ -21,7 +21,7 @@ class AUV():
     def addsensor(self, accuracy, Phi, Theta, seabed, estimateslope):      
         self.Sensors.append(Sensor(self.X, self.X, accuracy, Phi, Theta, seabed, estimateslope))
     def step(self):
-        self.delta_X = self.delta * self.V(self.t) #+ 0.1 * self.delta * np.random.normal(0,1,3)
+        self.delta_X = self.delta * self.V(self.t)# + 0.5 * self.delta * self.delta * np.array([0.06, 0.03, 0.02]) * np.random.normal(0,1,3)
         self.X = self.X + self.delta_X
         self.t = self.t + self.delta       
         for s in self.Sensors:

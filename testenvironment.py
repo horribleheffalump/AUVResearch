@@ -49,7 +49,7 @@ class testenvironment():
         for k in range(0,3):
             #f = plt.figure(num=None, figsize=(5,5), dpi=200, facecolor='w', edgecolor='k')
             ax = plt.subplot(gs[k])
-            ax.plot(self.auv.t_history, self.auv.X_history[:,k], color='black', linewidth=2.0, linestyle='dash')
+            ax.plot(self.auv.t_history, self.auv.X_history[:,k], color='black', linewidth=2.0, linestyle=':')
             for i,s in enumerate(self.auv.Sensors):
                 ax.plot(self.auv.t_history, s.X_estimate_history[:,k], color=self.colors[i], label=str(i))
             ax.plot(self.auv.t_history, self.auv.X_estimate_history[:,k], color='black', linewidth=2.0)
@@ -72,6 +72,65 @@ class testenvironment():
                 "elapsed seconds: " + str((finish-start).total_seconds()) + " " +
                 "\n"
                 )
+    def stats(self, points, sonars_xyz, path):
+        start = datetime.datetime.now()
+        self.run()
+        finish = datetime.datetime.now()
+        f = plt.figure(num=None, figsize=(15,5), dpi=200, facecolor='w', edgecolor='k')
+        gs = gridspec.GridSpec(1, 3, width_ratios=[1, 1, 1])     
+        gs.update(left=0.03, bottom=0.05, right=0.99, top=0.99, wspace=0.1, hspace=0.1)    
+        for p in points:
+            with open(path + "results_" + str(p) +".txt", "a") as myfile:
+                myfile.write(
+                    finish.strftime("%Y-%m-%d %H-%M-%S") + " " + 
+                    str(self.T) + " " + 
+                    str(self.delta) + " " + 
+                    str(self.NBeams) + " " + 
+                    str(self.auv.Sensors[sonars_xyz[0]].X_estimate_history[p,0] - self.auv.X_history[p,0]) + " " + 
+                    str(self.auv.Sensors[sonars_xyz[1]].X_estimate_history[p,1] - self.auv.X_history[p,1]) + " " + 
+                    str(self.auv.Sensors[sonars_xyz[2]].X_estimate_history[p,2] - self.auv.X_history[p,2]) + " " + 
+                    "elapsed seconds: " + str((finish-start).total_seconds()) + " " +
+                    "\n"
+                    )
+
+    def plot3DtrajectoryByCoords(self, sonars_xyz, path):
+        start = datetime.datetime.now()
+        self.run()
+        finish = datetime.datetime.now()
+        f = plt.figure(num=None, figsize=(15,5), dpi=200, facecolor='w', edgecolor='k')
+        gs = gridspec.GridSpec(1, 3, width_ratios=[1, 1, 1])     
+        gs.update(left=0.03, bottom=0.05, right=0.99, top=0.99, wspace=0.1, hspace=0.1)    
+
+        for k in range(0,3):
+            #f = plt.figure(num=None, figsize=(5,5), dpi=200, facecolor='w', edgecolor='k')
+            ax = plt.subplot(gs[k])
+            ax.plot(self.auv.t_history, self.auv.X_history[:,k], color='black', linewidth=2.0, linestyle=':')
+            for i,s in enumerate(self.auv.Sensors):
+                if (i == sonars_xyz[k]):
+                    ax.plot(self.auv.t_history, s.X_estimate_history[:,k], color=self.colors[i], label=str(i))
+        plt.savefig(path + finish.strftime("%Y-%m-%d %H-%M-%S-%f")+'.jpg')
+           
+    def plot3Dtrajectory(self, sonars_xyz, path):
+        start = datetime.datetime.now()
+        self.run()
+        finish = datetime.datetime.now()
+        fig = plt.figure(num=None, figsize=(15,5), dpi=200, facecolor='w', edgecolor='k')     
+        gs = gridspec.GridSpec(1, 1)     
+        ax = fig.add_subplot(gs[:], projection='3d')
+        _ = ax.plot(self.auv.X_history[:,0], self.auv.X_history[:,1], self.auv.X_history[:,2], color = 'blue')
+        _ = ax.plot(self.auv.Sensors[sonars_xyz[0]].X_estimate_history[:,0], self.auv.Sensors[sonars_xyz[1]].X_estimate_history[:,1], self.auv.Sensors[sonars_xyz[2]].X_estimate_history[:,2], color = 'black')
+
+        #for k in range(0,3):
+        #    #f = plt.figure(num=None, figsize=(5,5), dpi=200, facecolor='w', edgecolor='k')
+        #    ax = plt.subplot(gs[k])
+        #    ax.plot(self.auv.t_history, self.auv.X_history[:,k], color='black', linewidth=2.0, linestyle=':')
+        #    for i,s in enumerate(self.auv.Sensors):
+        #        if (i == sonars_xyz[k]):
+        #            ax.plot(self.auv.t_history, s.X_estimate_history[:,k], color=self.colors[i], label=str(i))
+        #plt.savefig(path + finish.strftime("%Y-%m-%d %H-%M-%S-%f")+'.jpg')
+        plt.show()  
+
+
     def plotseabedsequence(self, path, sideplots):
         for t in range(0, self.Npoints):
             print(self.delta * t)
