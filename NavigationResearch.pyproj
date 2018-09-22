@@ -29,6 +29,9 @@
     <Compile Include="AUV.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="stats_speed.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Sensor.py">
       <SubType>Code</SubType>
     </Compile>

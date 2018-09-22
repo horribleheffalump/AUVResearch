@@ -97,19 +97,15 @@ class Sensor():
     #    self.L_net_previous[:,:] = self.L_net_current[:,:]
 
     def beamnet(self, X):
-        L = self.__l(X)
-        R = X + np.reshape(L, (L.size, 1)) * self.e
-        
+        L = self.__l(X) # we use real position in order to calculate the measurements
+        R = self.X_estimate + np.reshape(L, (L.size, 1)) * self.e # to calculate the points, where the beam touches the seabed we may only use the current position estimate
         if self.estimateslope:
             # slope approximation
-            #dZdx, dZdy = self.seabed.dZ(R[:,0], R[:,1]) ####################### TEMP!!!!!!!!!!!!!!!
             self.sa.predict(R[:,0:2], R[:,2]) #, dZdx, dZdy)
             dZdx, dZdy = self.sa.partialdiffs(R[:,0:2])
         else:
             # exact slope
             dZdx, dZdy = self.seabed.dZ(R[:,0], R[:,1]) 
-            #dZdx = dZdx + np.random.normal(0, 0.02, dZdx.shape)
-            #dZdy = dZdy + np.random.normal(0, 0.02, dZdy.shape)
         M = dZdx * self.e[:,0] + dZdy * self.e[:,1] - self.e[:,2]  
     
         return R, L, dZdx, dZdy, M
