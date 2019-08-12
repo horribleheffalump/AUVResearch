@@ -1,5 +1,5 @@
 import numpy as np
-from sklearn import linear_model as lm
+#from sklearn import linear_model as lm
 from scipy.optimize import fsolve
 from Sensor import *
 
@@ -21,6 +21,7 @@ class AUV():
         self.Sensors = []
     def addsensor(self, accuracy, Phi, Theta, seabed, estimateslope):      
         self.Sensors.append(Sensor(self.X, self.X, accuracy, Phi, Theta, seabed, estimateslope))
+        #print(Phi, Theta)
     def step(self):
         V_cur = self.V(self.t) + 0.5 * self.delta * np.array([0.03, 0.04, 0.05]) * np.random.normal(0,1,3)
         self.delta_X = self.delta * V_cur 

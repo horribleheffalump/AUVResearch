@@ -62,9 +62,9 @@ class testenvironment():
         #print(err_cov)
         return(np.trace(err_cov))
     def plottrajectory(self, path):
-        start = datetime.datetime.now()
-        self.run()
-        finish = datetime.datetime.now()
+        #start = datetime.datetime.now()
+        #self.run()
+        #finish = datetime.datetime.now()
         f = plt.figure(num=None, figsize=(15,5), dpi=200, facecolor='w', edgecolor='k')
         gs = gridspec.GridSpec(1, 3, width_ratios=[1, 1, 1])     
         gs.update(left=0.03, bottom=0.05, right=0.99, top=0.99, wspace=0.1, hspace=0.1)    
@@ -78,9 +78,11 @@ class testenvironment():
                 ax.plot(self.auv.t_history, s.X_estimate_history[:,k], color=self.colors[i], label=str(i))
             ax.plot(self.auv.t_history, self.auv.X_estimate_history[:,k], color='black', linewidth=2.0)
             ax.legend()
-        plt.savefig(path + finish.strftime("%Y-%m-%d %H-%M-%S-%f") + '.jpg')
+        #plt.savefig(path + finish.strftime("%Y-%m-%d %H-%M-%S-%f") + '.png')
+        plt.savefig(path + 'pathsample.png')
         with open(path + "results.txt", "a") as myfile:
-            myfile.write(finish.strftime("%Y-%m-%d %H-%M-%S") + " " + str(self.T) + " " + str(self.delta) + " " + str(self.NBeams) + " " + #np.array2string(
+            #myfile.write(finish.strftime("%Y-%m-%d %H-%M-%S") + " " + str(self.T) + " " + str(self.delta) + " " + str(self.NBeams) + " " + #np.array2string(
+            myfile.write(" " + str(self.T) + " " + str(self.delta) + " " + str(self.NBeams) + " " + #np.array2string(
                 #    np.mean(list(map(lambda x:
                 #    x.X_estimate_history[self.Npoints-1,:] -
                 #    self.auv.X_history[self.Npoints-1,:], self.auv.Sensors)),
@@ -88,11 +90,11 @@ class testenvironment():
                 #    formatter={'float_kind':lambda x: "%.5f" % x}
                 #    ) + " " +
                 np.array2string(self.auv.X_estimate_history[self.Npoints - 1,:] - self.auv.X_history[self.Npoints - 1,:], 
-                    formatter={'float_kind':lambda x: "%.5f" % x}) + " " + "elapsed seconds: " + str((finish - start).total_seconds()) + " " + "\n")
+                    formatter={'float_kind':lambda x: "%.5f" % x}) + " " + "\n") #+ "elapsed seconds: " + str((finish - start).total_seconds()) + " " + "\n")
     def plotspeed(self, sonars_xyz, path):
-        start = datetime.datetime.now()
-        self.run()
-        finish = datetime.datetime.now()
+        #start = datetime.datetime.now()
+        #self.run()
+        #finish = datetime.datetime.now()
         f = plt.figure(num=None, figsize=(15,5), dpi=200, facecolor='w', edgecolor='k')
         gs = gridspec.GridSpec(1, 3, width_ratios=[1, 1, 1])     
         gs.update(left=0.03, bottom=0.05, right=0.99, top=0.99, wspace=0.15, hspace=0.1)    
@@ -108,19 +110,39 @@ class testenvironment():
         #plt.show()
         f.savefig(path+'speed_sample.pdf')
 
+    def plotspeederror(self, sonars_xyz, path):
+        #start = datetime.datetime.now()
+        #self.run()
+        #finish = datetime.datetime.now()
+        f = plt.figure(num=None, figsize=(15,5), dpi=200, facecolor='w', edgecolor='k')
+        gs = gridspec.GridSpec(1, 3, width_ratios=[1, 1, 1])     
+        gs.update(left=0.03, bottom=0.05, right=0.99, top=0.99, wspace=0.15, hspace=0.1)    
+
+        for k in range(0,3):
+            ax = plt.subplot(gs[k])
+            #ax.plot(self.auv.t_history, self.auv.V_history[:,k], color='black', linewidth=2.0)
+            for i,s in enumerate(self.auv.Sensors):
+                if (i == sonars_xyz[k]):
+                    ax.plot(self.auv.t_history[:], s.delta_X_estimate_history[:,k] / self.delta - self.auv.V_history[:,k], color = 'red', label=str(i)) #color=self.colors[i]
+            #ax.plot(self.auv.t_history, self.auv.X_estimate_history[:,k], color='black', linewidth=2.0)
+            #ax.legend()
+        #plt.show()
+        f.savefig(path+'speed_error_sample.pdf')
+
     def stats(self, points, sonars_xyz, path):
-        start = datetime.datetime.now()
-        self.run()
-        finish = datetime.datetime.now()
+        #start = datetime.datetime.now()
+        #self.run()
+        #finish = datetime.datetime.now()
         f = plt.figure(num=None, figsize=(15,5), dpi=200, facecolor='w', edgecolor='k')
         gs = gridspec.GridSpec(1, 3, width_ratios=[1, 1, 1])     
         gs.update(left=0.03, bottom=0.05, right=0.99, top=0.99, wspace=0.1, hspace=0.1)    
         for p in points:
             with open(path + "results_" + str(p) + ".txt", "a") as myfile:
-                myfile.write(finish.strftime("%Y-%m-%d %H-%M-%S") + " " + str(self.T) + " " + str(self.delta) + " " + str(self.NBeams) + " " + str(self.auv.Sensors[sonars_xyz[0]].X_estimate_history[p,0] - self.auv.X_history[p,0]) + " " + str(self.auv.Sensors[sonars_xyz[1]].X_estimate_history[p,1] - self.auv.X_history[p,1]) + " " + str(self.auv.Sensors[sonars_xyz[2]].X_estimate_history[p,2] - self.auv.X_history[p,2]) + " " + "elapsed seconds: " + str((finish - start).total_seconds()) + " " + "\n")
+                #myfile.write(finish.strftime("%Y-%m-%d %H-%M-%S") + " " + str(self.T) + " " + str(self.delta) + " " + str(self.NBeams) + " " + str(self.auv.Sensors[sonars_xyz[0]].X_estimate_history[p,0] - self.auv.X_history[p,0]) + " " + str(self.auv.Sensors[sonars_xyz[1]].X_estimate_history[p,1] - self.auv.X_history[p,1]) + " " + str(self.auv.Sensors[sonars_xyz[2]].X_estimate_history[p,2] - self.auv.X_history[p,2]) + " " + "elapsed seconds: " + str((finish - start).total_seconds()) + " " + "\n")
+                myfile.write(" " + str(self.T) + " " + str(self.delta) + " " + str(self.NBeams) + " " + str(self.auv.Sensors[sonars_xyz[0]].X_estimate_history[p,0] - self.auv.X_history[p,0]) + " " + str(self.auv.Sensors[sonars_xyz[1]].X_estimate_history[p,1] - self.auv.X_history[p,1]) + " " + str(self.auv.Sensors[sonars_xyz[2]].X_estimate_history[p,2] - self.auv.X_history[p,2]) + " " + "elapsed seconds: " + str((finish - start).total_seconds()) + " " + "\n")
 
     def speedstats(self, sonars_xyz, path):
-        self.run()
+        #self.run()
         for k in range(0,3):
             with open(path + "results_speed_" + str(k) + ".txt", "a") as myfile:
                 s = str(self.auv.V_history[0,k] - self.auv.Sensors[sonars_xyz[k]].delta_X_estimate_history[0,k] / self.delta)
@@ -130,9 +152,9 @@ class testenvironment():
 
 
     def plot3DtrajectoryByCoords(self, sonars_xyz, path):
-        start = datetime.datetime.now()
-        self.run()
-        finish = datetime.datetime.now()
+        #start = datetime.datetime.now()
+        #self.run()
+        #finish = datetime.datetime.now()
         f = plt.figure(num=None, figsize=(15,5), dpi=200, facecolor='w', edgecolor='k')
         gs = gridspec.GridSpec(1, 3, width_ratios=[1, 1, 1])     
         gs.update(left=0.03, bottom=0.05, right=0.99, top=0.99, wspace=0.1, hspace=0.1)    
@@ -145,12 +167,13 @@ class testenvironment():
             for i,s in enumerate(self.auv.Sensors):
                 if (i == sonars_xyz[k]):
                     ax.plot(self.auv.t_history, s.X_estimate_history[:,k], color=self.colors[i], label=str(i))
-        plt.savefig(path + finish.strftime("%Y-%m-%d %H-%M-%S-%f") + '.jpg')
+        #plt.savefig(path + finish.strftime("%Y-%m-%d %H-%M-%S-%f") + '.jpg')
+        plt.savefig(path + '3Dpathsample.png')
            
     def plot3Dtrajectory(self, sonars_xyz, path):
-        start = datetime.datetime.now()
-        self.run()
-        finish = datetime.datetime.now()
+        #start = datetime.datetime.now()
+        #self.run()
+        #finish = datetime.datetime.now()
         fig = plt.figure(num=None, figsize=(15,5), dpi=200, facecolor='w', edgecolor='k')     
         gs = gridspec.GridSpec(1, 1)     
         ax = fig.add_subplot(gs[:], projection='3d')
@@ -338,7 +361,7 @@ class testenvironment():
         plt.show()
 
         
-    def showscheme(self):
+    def showscheme(self): # model scheme with basic notation
         fig = plt.figure(figsize=(10, 6), dpi=200)
         ax = fig.gca(projection='3d')
         ax.view_init(50, 30)
