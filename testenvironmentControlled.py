@@ -30,7 +30,7 @@ class Arrow3D(FancyArrowPatch):
         self.set_positions((xs[0],ys[0]),(xs[1],ys[1]))
         FancyArrowPatch.draw(self, renderer)
 
-class testenvironment():
+class testenvironmentControlled():
     """AUV model"""
     def __init__(self, T, delta, NBeams, accuracy, PhiBounds, ThetaBounds, auv, seabed, estimateslope):
 
@@ -54,8 +54,9 @@ class testenvironment():
         self.colors = ['red', 'green', 'blue', 'cyan', 'pink', 'yellow', 'orange', 'purple']
     def run(self):
         for i in range(0, self.Npoints):
+            t = self.delta * i
             self.auv.step()
-            print(self.delta * i)
+            print(t)
     def crit(self):
         for i in range(0, self.Npoints):
             self.auv.step()
@@ -74,10 +75,12 @@ class testenvironment():
             #f = plt.figure(num=None, figsize=(5,5), dpi=200, facecolor='w',
             #edgecolor='k')
             ax = plt.subplot(gs[k])
-            ax.plot(self.auv.t_history, self.auv.X_history[:,k], color='black', linewidth=2.0, linestyle=':')
+
             for i,s in enumerate(self.auv.Sensors):
-                ax.plot(self.auv.t_history, s.X_estimate_history[:,k], color=self.colors[i], label=str(i))
-            ax.plot(self.auv.t_history, self.auv.X_estimate_history[:,k], color='black', linewidth=2.0)
+                ax.plot(self.auv.t_history, s.X_estimate_history[:,k], color=self.colors[i], label=str(i), linewidth=0.5)
+            ax.plot(self.auv.t_history, self.auv.XNominal_history[:,k], color='grey', linewidth=4.0)
+            ax.plot(self.auv.t_history, self.auv.XReal_history[:,k], color='black', linewidth=2.0)
+            ax.plot(self.auv.t_history, self.auv.XReal_estimate_history[:,k], color='red', linewidth=2.0)
             ax.legend()
         #plt.savefig(path + finish.strftime("%Y-%m-%d %H-%M-%S-%f") + '.png')
         plt.savefig(path + 'pathsample.png')
@@ -92,7 +95,7 @@ class testenvironment():
                 #    axis=0),
                 #    formatter={'float_kind':lambda x: "%.5f" % x}
                 #    ) + " " +
-                np.array2string(self.auv.X_estimate_history[self.Npoints - 1,:] - self.auv.X_history[self.Npoints - 1,:], 
+                np.array2string(self.auv.XReal_estimate_history[self.Npoints - 1,:] - self.auv.XReal_history[self.Npoints - 1,:], 
                     formatter={'float_kind':lambda x: "%.5f" % x}) + " " + "\n") #+ "elapsed seconds: " + str((finish - start).total_seconds()) + " " + "\n")
     def plotspeed(self, sonars_xyz, path):
         #start = datetime.datetime.now()
@@ -104,11 +107,12 @@ class testenvironment():
 
         for k in range(0,3):
             ax = plt.subplot(gs[k])
-            ax.plot(self.auv.t_history, self.auv.V_history[:,k], color='black', linewidth=2.0)
             for i,s in enumerate(self.auv.Sensors):
                 if (i == sonars_xyz[k]):
-                    ax.plot(self.auv.t_history[:], s.delta_X_estimate_history[:,k] / self.delta, color = 'red', label=str(i)) #color=self.colors[i]
-            #ax.plot(self.auv.t_history, self.auv.X_estimate_history[:,k],
+                    ax.plot(self.auv.t_history[:], s.delta_X_estimate_history[:,k] / self.delta, color = 'red', label=str(i), linewidth = 0.5) #color=self.colors[i]
+            ax.plot(self.auv.t_history[:-1], self.auv.VNominal_history[:,k], color='grey', linewidth=4.0)
+            ax.plot(self.auv.t_history[:-1], self.auv.VReal_history[:,k], color='black', linewidth=2.0)
+
                                                                                                                                          #color='black', linewidth=2.0)
                                                                                                                                          #ax.legend()
         #plt.show()
@@ -192,8 +196,9 @@ class testenvironment():
         fig = plt.figure(num=None, figsize=(15,5), dpi=200, facecolor='w', edgecolor='k')     
         gs = gridspec.GridSpec(1, 1)     
         ax = fig.add_subplot(gs[:], projection='3d')
-        _ = ax.plot(self.auv.X_history[:,0], self.auv.X_history[:,1], self.auv.X_history[:,2], color = 'blue')
-        _ = ax.plot(self.auv.Sensors[sonars_xyz[0]].X_estimate_history[:,0], self.auv.Sensors[sonars_xyz[1]].X_estimate_history[:,1], self.auv.Sensors[sonars_xyz[2]].X_estimate_history[:,2], color = 'black')
+        _ = ax.plot(self.auv.XNominal_history[:,0], self.auv.XNominal_history[:,1], self.auv.XNominal_history[:,2], color = 'grey', linewidth=4.0)
+        _ = ax.plot(self.auv.XReal_history[:,0], self.auv.XReal_history[:,1], self.auv.XReal_history[:,2], color = 'black', linewidth=2.0)
+        _ = ax.plot(self.auv.Sensors[sonars_xyz[0]].X_estimate_history[:,0], self.auv.Sensors[sonars_xyz[1]].X_estimate_history[:,1], self.auv.Sensors[sonars_xyz[2]].X_estimate_history[:,2], color = 'red')
 
         #for k in range(0,3):
         #    #f = plt.figure(num=None, figsize=(5,5), dpi=200, facecolor='w',

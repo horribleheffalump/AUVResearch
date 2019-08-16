@@ -98,17 +98,22 @@ class Sensor():
 
     def beamnet(self, X):
         L = self.__l(X) # we use real position in order to calculate the measurements
-        R = self.X_estimate + np.reshape(L, (L.size, 1)) * self.e # to calculate the points, where the beam touches the seabed we may only use the current position estimate
+        R = np.reshape(L, (L.size, 1)) * self.e 
+        # X+R - the points where the beams actually touch the seabed (if L is evaluated with zero noise)
+        # hat{X}+R - the estimated points where the beams touch the seabed
         if self.estimateslope:
             # slope approximation
             self.sa.predict(R[:,0:2], R[:,2]) #, dZdx, dZdy)
             dZdx, dZdy = self.sa.partialdiffs(R[:,0:2])
         else:
             # exact slope
-            dZdx, dZdy = self.seabed.dZ(R[:,0], R[:,1]) 
+            # seems that this method is practically useless, since we are trying to evaluate the slope at points we've calculated using the estimate \hat{X}
+            # and not at the place where the beams actually touch the seabed
+            dZdx, dZdy = self.seabed.dZ((X+R)[:,0], (X+R)[:,1]) 
+            # but if we substitute \hat{X} with real X, we may use the estimate evaluated with exact slope as an unachievable "ideal"
         M = dZdx * self.e[:,0] + dZdy * self.e[:,1] - self.e[:,2]  
     
-        return R, L, dZdx, dZdy, M
+        return R+X, L, dZdx, dZdy, M
 
     def step(self, X):
         _, L, dZdx, dZdy, M = self.beamnet(X)
@@ -122,8 +127,11 @@ class Sensor():
         reg = lm.LinearRegression()
         reg.fit(A, B)
         V = reg.predict(np.eye(3))
-        self.delta_X_estimate = np.reshape(V,(1,V.size)) 
+        self.delta_X_estimate = V 
+        #self.delta_X_estimate = np.reshape(V,(1,V.size)) 
         self.X_estimate = self.X_estimate + self.delta_X_estimate 
+        #print(self.delta_X_estimate)
+        #print(self.X_estimate)
         self.X_estimate_history = np.vstack((self.X_estimate_history, self.X_estimate))
         self.delta_X_estimate_history = np.vstack((self.delta_X_estimate_history, self.delta_X_estimate))
 

@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{82c268e0-cfaf-415e-aa32-7a50b3f1c66b}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>runtest.py</StartupFile>
+    <StartupFile>runtestControlled.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -26,9 +26,11 @@
     <Compile Include="angles_optimization_power.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="AUVControlled.py" />
     <Compile Include="AUV.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="runtestControlled.py" />
     <Compile Include="stats_speed.py">
       <SubType>Code</SubType>
     </Compile>
@@ -41,6 +43,7 @@
     <Compile Include="stats.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="testenvironmentControlled.py" />
     <Compile Include="testenvironment.py">
       <SubType>Code</SubType>
     </Compile>
