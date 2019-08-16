@@ -40,12 +40,16 @@ class AUVControlled():
 
     def step(self):
         #print(self.Sensors[0].X_estimate)
-        XRealEstimate = np.mean(list(map(lambda x: x.X_estimate, self.Sensors)), axis=0)
+        if len(self.Sensors) > 0:
+            XRealEstimate = np.mean(list(map(lambda x: x.X_estimate, self.Sensors)), axis=0)
+        else:
+            XRealEstimate = self.XReal_estimate_history[self.k] + self.delta * self.VReal_history[self.k-1]
         #print(self.XNominal_history[self.k])
         #print(XRealEstimate)
-        Uopt = AUVControlled.UOptimal(self.XNominal_history[self.k] - XRealEstimate, self.v, self.UNominal(self.t), self.delta)
+        Uopt = AUVControlled.UOptimal(self.XNominal_history[self.k] - XRealEstimate, self.v, self.UNominal(self.t), self.delta)        
         VReal = AUVControlled.V(self.v, Uopt)
         self.VReal_history[self.k,:] = VReal 
+
         self.delta_X = self.delta * VReal + self.sigmaW * np.array(np.random.normal(0,1,3))
         self.X = self.X + self.delta_X
         for s in self.Sensors:
@@ -56,6 +60,7 @@ class AUVControlled():
         self.k = self.k + 1
         self.XReal_history[self.k,:] = self.X 
         self.XReal_estimate_history[self.k,:] = XRealEstimate
+
 
     @staticmethod
     def UOptimal(shift, v, UNominal, delta):

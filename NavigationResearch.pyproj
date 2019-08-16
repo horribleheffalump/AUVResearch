@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{82c268e0-cfaf-415e-aa32-7a50b3f1c66b}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>runtestControlled.py</StartupFile>
+    <StartupFile>CMNFTest.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -28,6 +28,12 @@
     </Compile>
     <Compile Include="AUVControlled.py" />
     <Compile Include="AUV.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="CMNFFilter.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="CMNFTest.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="runtestControlled.py" />
