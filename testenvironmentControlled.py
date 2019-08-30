@@ -1,15 +1,17 @@
 from AUV import *
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
-from mpl_toolkits.mplot3d import Axes3D
+
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 import numpy as np
 import datetime
 
-from matplotlib.patches import FancyArrowPatch
-from mpl_toolkits.mplot3d import proj3d
 
+from mpl_toolkits.mplot3d import Axes3D
+
+
+from DrawHelper import *
 
 from matplotlib import rc
 rc('font',**{'family':'serif'})
@@ -19,16 +21,7 @@ rc('text.latex',preamble=r'\usepackage[T2A]{fontenc}')
 rc('text.latex',preamble=r'\usepackage[utf8]{inputenc}')
 rc('text.latex',preamble=r'\usepackage[russian]{babel}')
 
-class Arrow3D(FancyArrowPatch):
-    def __init__(self, xs, ys, zs, *args, **kwargs):
-        FancyArrowPatch.__init__(self, (0,0), (0,0), *args, **kwargs)
-        self._verts3d = xs, ys, zs
 
-    def draw(self, renderer):
-        xs3d, ys3d, zs3d = self._verts3d
-        xs, ys, zs = proj3d.proj_transform(xs3d, ys3d, zs3d, renderer.M)
-        self.set_positions((xs[0],ys[0]),(xs[1],ys[1]))
-        FancyArrowPatch.draw(self, renderer)
 
 class testenvironmentControlled():
     """AUV model"""
@@ -77,10 +70,10 @@ class testenvironmentControlled():
             ax = plt.subplot(gs[k])
 
             for i,s in enumerate(self.auv.Sensors):
-                ax.plot(self.auv.t_history, s.X_estimate_history[:,k], color=self.colors[i], label=str(i), linewidth=0.5)
-            ax.plot(self.auv.t_history, self.auv.XNominal_history[:,k], color='grey', linewidth=4.0)
-            ax.plot(self.auv.t_history, self.auv.XReal_history[:,k], color='black', linewidth=2.0)
-            ax.plot(self.auv.t_history, self.auv.XReal_estimate_history[:,k], color='red', linewidth=2.0)
+                ax.plot(self.auv.t_history, s.X_estimate_history[:,k], color=self.colors[i], label='Estimate' + str(i), linewidth=0.5)
+            ax.plot(self.auv.t_history, self.auv.XNominal_history[:,k], color='grey', linewidth=4.0, label='Nominal')
+            ax.plot(self.auv.t_history, self.auv.XReal_history[:,k], color='black', linewidth=2.0, label='Real')
+            ax.plot(self.auv.t_history, self.auv.XReal_estimate_history[:,k], color='red', linewidth=2.0, label='Estimate')
             ax.legend()
         #plt.savefig(path + finish.strftime("%Y-%m-%d %H-%M-%S-%f") + '.png')
         plt.savefig(path + 'pathsample.png')
@@ -109,10 +102,10 @@ class testenvironmentControlled():
             ax = plt.subplot(gs[k])
             for i,s in enumerate(self.auv.Sensors):
                 if (i == sonars_xyz[k]):
-                    ax.plot(self.auv.t_history[:], s.delta_X_estimate_history[:,k] / self.delta, color = 'red', label=str(i), linewidth = 0.5) #color=self.colors[i]
-            ax.plot(self.auv.t_history[:-1], self.auv.VNominal_history[:,k], color='grey', linewidth=4.0)
-            ax.plot(self.auv.t_history[:-1], self.auv.VReal_history[:,k], color='black', linewidth=2.0)
-
+                    ax.plot(self.auv.t_history[:], s.delta_X_estimate_history[:,k] / self.delta, color = 'red', label='Estimate' + str(i), linewidth = 0.5) #color=self.colors[i]
+            ax.plot(self.auv.t_history[:-1], self.auv.VNominal_history[:,k], color='grey', linewidth=4.0, label='Nominal')
+            ax.plot(self.auv.t_history[:-1], self.auv.VReal_history[:,k], color='black', linewidth=2.0, label='Real')
+            ax.legend()
                                                                                                                                          #color='black', linewidth=2.0)
                                                                                                                                          #ax.legend()
         #plt.show()
@@ -189,17 +182,19 @@ class testenvironmentControlled():
         #plt.savefig(path + finish.strftime("%Y-%m-%d %H-%M-%S-%f") + '.jpg')
         plt.savefig(path + '3Dpathsample.png')
            
-    def plot3Dtrajectory(self, sonars_xyz, path):
+    def plot3Dtrajectory(self, sonarNumber, path):
         #start = datetime.datetime.now()
         #self.run()
         #finish = datetime.datetime.now()
         fig = plt.figure(num=None, figsize=(15,5), dpi=200, facecolor='w', edgecolor='k')     
         gs = gridspec.GridSpec(1, 1)     
         ax = fig.add_subplot(gs[:], projection='3d')
-        _ = ax.plot(self.auv.XNominal_history[:,0], self.auv.XNominal_history[:,1], self.auv.XNominal_history[:,2], color = 'grey', linewidth=4.0)
-        _ = ax.plot(self.auv.XReal_history[:,0], self.auv.XReal_history[:,1], self.auv.XReal_history[:,2], color = 'black', linewidth=2.0)
-        _ = ax.plot(self.auv.Sensors[sonars_xyz[0]].X_estimate_history[:,0], self.auv.Sensors[sonars_xyz[1]].X_estimate_history[:,1], self.auv.Sensors[sonars_xyz[2]].X_estimate_history[:,2], color = 'red')
-
+        _ = ax.plot(self.auv.XNominal_history[:,0], self.auv.XNominal_history[:,1], self.auv.XNominal_history[:,2], color = 'grey', linewidth=4.0, label = 'Nominal')
+        _ = ax.plot(self.auv.XReal_history[:,0], self.auv.XReal_history[:,1], self.auv.XReal_history[:,2], color = 'black', linewidth=2.0, label = 'Real')
+        for i,s in enumerate(self.auv.Sensors):
+            if (i == sonarNumber):
+                _ = ax.plot(s.X_estimate_history[:,0], s.X_estimate_history[:,1], s.X_estimate_history[:,2], color = 'red', label = 'estimate ' + str(i))
+        ax.legend()
         #for k in range(0,3):
         #    #f = plt.figure(num=None, figsize=(5,5), dpi=200, facecolor='w',
         #    edgecolor='k')
@@ -398,101 +393,219 @@ class testenvironmentControlled():
         plt.show()
 
         
-    def showscheme(self): # model scheme with basic notation
+    def showsonarmodel(self, path, show=False): # model scheme with basic notation
         fig = plt.figure(figsize=(10, 6), dpi=200)
         ax = fig.gca(projection='3d')
-        ax.view_init(50, 30)
+        ax.view_init(31, 26)
 
-        bndX = [self.auv.X[0], self.auv.X[0]]
-        bndY = [self.auv.X[1], self.auv.X[1]]
-        
-        
-        for i, s in enumerate(self.auv.Sensors):
-            bn, _, _, _, _ = s.beamnet(self.auv.X)
-            bn2_X, bn2_Y, bn2_Z = bn[:,0], bn[:,1], bn[:,2]
-            bndX = [np.min(np.hstack((bn2_X, bndX[0]))), np.max(np.hstack((bn2_X, bndX[1])))]
-            bndY = [np.min(np.hstack((bn2_Y, bndY[0]))), np.max(np.hstack((bn2_Y, bndY[1])))]
-            if i == 4: # take only one
-                #_ = ax.scatter(bn2_X[:], bn2_Y[:], bn2_Z[:], color =
-                                      #self.colors[i], s = 30)
-                x, y, z = bn2_X[-8], bn2_Y[-8], bn2_Z[-8]
-        print('')
-
-        xa, ya, za = self.auv.X[0], self.auv.X[1], self.auv.X[2]
+        # set good viewpoint
+        drawPoint(ax, [1.1, 1.1, 1.1], color = 'white', s = 0)
 
 
-        _ = ax.scatter(x, y, z, color = 'black', s = 30)
-        _ = ax.plot([xa, x], [ya, y], [za, z], color = 'black')
-        _ = ax.plot([xa, x], [ya, y], [-35, -35], color = 'black', linewidth = 0.5)
+        s = 0.1
+        Xk = np.array([0.2,0.3,0.7])
+        v = np.array([-0.05,0.1,0.05])
+        x = np.array([0.7,0.8,0.2])
+
+        #points
+        drawPoint(ax, Xk)
+        drawPoint(ax, x)
+        textAtPoint(ax, Xk, '${\mathbf{X}}_{k}$', [0,-s,-s])
+        textAtPoint(ax, x, '$(x,y,z)^T_{ij, k}$', [0,0,s])
+        for i in range(-2,3):
+            for j in range(-2,3):
+                drawPoint(ax, x+np.array([i*0.05, j*0.05,0]),'black', 10, alpha=0.1)
+                drawLine(ax, Xk, x+np.array([i*0.05, j*0.05,0]), 'black', linestyle=':', linewidth=0.5, alpha = 0.2)
 
 
-        #_ = ax.plot([x, 0], [y, y], [z, z], color = 'black', linestyle=':')
-        #_ = ax.plot([x, x], [y, 0], [z, z], color = 'black', linestyle=':')
-        #_ = ax.plot([0, 0], [0, y], [z, z], color = 'black', linestyle=':')
-        #_ = ax.plot([0, x], [0, 0], [z, z], color = 'black', linestyle=':')
-        #_ = ax.plot([0, 0], [y, y], [-35, z], color = 'black', linestyle=':')
-        #_ = ax.plot([x, x], [0, 0], [-35, z], color = 'black', linestyle=':')
-        _ = ax.plot([x, 0], [y, y], [-35, -35], color = 'black', linestyle=':')
-        _ = ax.plot([x, x], [y, 0], [-35, -35], color = 'black', linestyle=':')   
-        _ = ax.plot([x, x], [y, y], [-35, z], color = 'black', linestyle=':')
+        #Xk projections
+        drawLine(ax, Xk, PZ(Xk), linestyle=':', linewidth=0.5)
+        drawLine(ax, [x[0], Xk[1], 0], Y(Xk), linestyle=':', linewidth=0.5)
+        drawLine(ax, PZ(Xk), X(Xk), linestyle=':', linewidth=0.5)
 
+        #x projections
+        drawLine(ax, x, PZ(x), linestyle=':', linewidth=0.5)
+        drawLine(ax, PZ(x), Y(x), linestyle=':', linewidth=0.5)
+        drawLine(ax, PZ(x), X(x), linestyle=':', linewidth=0.5)
 
-        _ = ax.scatter(xa, ya, za, color = 'black', s = 100)
-        _ = ax.plot([xa + 5.0, 0], [ya, ya], [-35, -35], color = 'black', linestyle=':')
-        _ = ax.plot([xa, xa], [ya, 0], [-35, -35], color = 'black', linestyle=':')   
-        _ = ax.plot([xa, xa], [ya, ya], [-35, za], color = 'black', linestyle=':')
-    
-        xb,yb,zb = xa + (x - xa) * 0.15, ya + (y - ya) * 0.15, za + (z - za) * 0.15 
-        r = np.sqrt(np.power(xb - xa, 2) + np.power(yb - ya, 2) + np.power(zb - za,2))
-        x_angle = np.concatenate([np.arange(xa,xb,(xb - xa) / 20.0), np.array([xb])])
-        y_angle = np.concatenate([np.arange(ya,yb,(yb - ya) / 20.0), np.array([yb])])
-        z_angle = za - np.sqrt(np.power(r, 2) - np.power(x_angle - xa, 2) - np.power(y_angle - ya, 2))
-        _ = ax.plot(x_angle, y_angle, z_angle, color = 'black', linewidth = 0.5)
+        #Xk to x and projections
+        drawLine(ax, PZ(Xk), PZ(x), linestyle=':', linewidth=0.5)
+        drawLine(ax, Xk, [x[0],x[1],Xk[2]], linestyle=':', linewidth=0.5)
 
-        ax.text(xa + (xb - xa) / 2, ya + (yb - ya) / 2, zb - 3.0 , '$\\phi_i$')
-        
-        xb,yb,zb = xa + (x - xa) * 0.15, ya + (y - ya) * 0.15, za + (z - za) * 0.15 
-        r = np.sqrt(np.power(xb - xa, 2) + np.power(yb - ya, 2))
-        y_angle = np.concatenate([np.arange(ya,yb,(yb - ya) / 20.0), np.array([yb])])
-        x_angle = xa + np.sqrt(np.power(r, 2) - np.power(y_angle - ya, 2)) 
-        _ = ax.plot(x_angle, y_angle, -35, color = 'black', linewidth = 0.5)
-        xb,yb,zb = xa + (x - xa) * 0.18, ya + (y - ya) * 0.18, za + (z - za) * 0.18 
-        r = np.sqrt(np.power(xb - xa, 2) + np.power(yb - ya, 2))
-        y_angle = np.concatenate([np.arange(ya,yb,(yb - ya) / 20.0), np.array([yb])])
-        x_angle = xa + np.sqrt(np.power(r, 2) - np.power(y_angle - ya, 2)) 
-        _ = ax.plot(x_angle, y_angle, -35, color = 'black', linewidth = 0.5)
-
-        ax.text(xa + 7.0, ya + 3.0, -35.7 , '$\\theta_k$')
-
-        X = np.arange(bndX[0], bndX[1], (bndX[1] - bndX[0]) / 100.0)
-        Y = np.arange(bndY[0], bndY[1], (bndY[1] - bndY[0]) / 100.0)
-        X, Y = np.meshgrid(X, Y)
-        Z = self.seabed.Z(X,Y)
-
-        axisX = Arrow3D([-2, 35], [0, 0], [-35, -35], mutation_scale=10, arrowstyle="-|>", color="black")
-        axisY = Arrow3D([0, 0], [-2, 35], [-35, -35], mutation_scale=10, arrowstyle="-|>", color="black")
-        axisZ = Arrow3D([0, 0], [0, 0], [-36, -5], mutation_scale=10, arrowstyle="-|>", color="black")
-        ax.add_artist(axisX)
-        ax.add_artist(axisY)
-        ax.add_artist(axisZ)
-
+        sX = np.arange(-0.1, 1.1, 1.0 / 100.0)
+        sY = np.arange(-0.1, 1.05, 1.0 / 100.0)
+        sX, sY = np.meshgrid(sX, sY)
+        sZ = x[2] * np.ones_like(sX)
         # Plot the surface.
-        surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm, linewidth=0, antialiased=False, alpha=0.3)
+        surf = ax.plot_surface(sX, sY, sZ, cmap=cm.copper, linewidth=0, antialiased=False, alpha=0.1)
+        ax.text(-0.1, 0.6, x[2], 'seabed', (0,1,0.1))
 
-        ax.text(xa, ya + 1.0, za + 1.0, '$\mathbf{X}(t_j)$')
-        ax.text(x, y + 1.0, z + 1.0, '$(x,y,z)_{ik,j}^T$')
-        ax.text(xa + (x - xa) / 2, ya + (y - ya) / 2 + 1.0, za + (z - za) / 2 + 1.0, '$L_{ik,j}$')
+        #vectors
+        drawArrow(ax, Xk, Xk+v)
+        textAtPoint(ax, Xk+v, '${\mathbf{V}}_k^*$', [0.0, -0.5*s, 0.0])
+        drawLine(ax, Xk, x)
 
-        ax.text(35, 1.0, -36, '$x$')
-        ax.text(1.0, 35, -36, '$y$')
-        ax.text(1.0, 1.0, -5, '$z$')
+        #angles
+        drawArcScale(ax, Xk, x, [x[0],x[1],Xk[2]], scale = 0.10)
+        textAtPoint(ax, Xk, '$\gamma_k + \gamma_i$', [s, s, 0.0])
+
+        drawArcScale(ax, PZ(Xk), PZ(x),  [x[0], Xk[1], 0], scale = 0.15)
+        drawArcScale(ax, PZ(Xk), PZ(x),  [x[0], Xk[1], 0], scale = 0.18)
+        textAtPoint(ax, PZ(Xk), '$\\theta_k + \\theta_i$', [2.5*s, 0.5*s, 0])
+
+        #axes
+        drawArrow(ax, [-0.01, 0.0, 0.0], [1.0, 0.0, 0.0])
+        drawArrow(ax, [0.0, -0.01, 0.0], [0.0, 1.0, 0.0])
+        drawArrow(ax, [0.0, 0.0, -0.01], [0.0, 0.0, 1.0])
+        textAtPoint(ax, [1.0, 0.05, 0.0], '$x$')
+        textAtPoint(ax, [0.1, 1.0, 0.0], '$y$')
+        textAtPoint(ax, [0.05, 0.05, 1.0], '$z$')
 
 
         ax.zaxis.set_major_locator(LinearLocator(10))
         ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
         ax.set_axis_off()
-        # Add a color bar which maps values to colors.
-        #fig.colorbar(surf, shrink=0.5, aspect=5)
-        #fig.tight_layout()
-        #fig.subplots_adjust(left=-0.2, right=1.2, top=1.2, bottom =-0.2)
-        plt.show()
+        fig.tight_layout()
+        if show:
+            plt.show()
+        else:
+            plt.savefig(path)
+
+    def showoptimalcontrol(self, path, show=False): # model scheme with basic notation
+        fig = plt.figure(figsize=(10, 6), dpi=200)
+        ax = fig.gca(projection='3d')
+        ax.view_init(31, 26)
+
+        # set good viewpoint
+        drawPoint(ax, [1.1, 1.1, 1.1], color = 'white', s = 0)
+
+
+        s = 0.1
+        XNk = np.array([0.5,0.3,0.5])
+        XNk1 = np.array([0.2,0.7,0.8])
+        Xk = np.array([0.7,0.5,0.2])
+
+        #points
+        drawPoint(ax, XNk)
+        drawPoint(ax, XNk1)
+        drawPoint(ax, Xk)
+        textAtPoint(ax, XNk, '$\mathring{\mathbf{X}}_k$', [0,0,s])
+        textAtPoint(ax, XNk1, '$\mathring{\mathbf{X}}_{k+1}$', [0,0,s])
+        textAtPoint(ax, Xk, '${\mathbf{X}}_{k}$', [0,-s,-s])
+
+        #XNk1 projections
+        drawLine(ax, XNk1, PZ(XNk1), linestyle=':', linewidth=0.5)
+        drawLine(ax, PZ(XNk1), Y(XNk1), linestyle=':', linewidth=0.5)
+        drawLine(ax, PZ(XNk1), X(XNk1), linestyle=':', linewidth=0.5)
+
+        #Xk projections
+        drawLine(ax, Xk, PZ(Xk), linestyle=':', linewidth=0.5)
+        drawLine(ax, PZ(Xk), Y(Xk), linestyle=':', linewidth=0.5)
+        drawLine(ax, PZ(Xk), X(Xk), linestyle=':', linewidth=0.5)
+
+        #Xk to XNk1 and projections
+        drawLine(ax, PZ(Xk), PZ(XNk1), linestyle=':', linewidth=0.5)
+        drawLine(ax, Xk, [XNk1[0],XNk1[1],Xk[2]], linestyle=':', linewidth=0.5)
+        drawLine(ax, 0.5*(Xk + XNk1), XNk1, linestyle=':', linewidth=0.5)
+
+        #deltas
+        drawLine(ax, PZ(Xk), [Xk[0], XNk1[1], 0], linestyle='-', linewidth=0.5)
+        drawLine(ax, PZ(XNk1), [Xk[0], XNk1[1], 0], linestyle='-', linewidth=0.5)
+        drawLine(ax, XNk1, [XNk1[0], XNk1[1], Xk[2]], linestyle='-', linewidth=0.5)
+        textAtPoint(ax, [0.7*Xk[0] + 0.3*XNk1[0], XNk1[1], 0.0], '$\Delta \mathring{X}_k + \Delta t \mathring{V}^X_k$', [0.0,s,0.0])
+        textAtPoint(ax, [Xk[0], 0.8*Xk[1] + 0.2*XNk1[1], 0.0], '$\Delta \mathring{Y}_k + \Delta t \mathring{V}^Y_k$', [2.0*s, 0.0, -0.5*s])
+        textAtPoint(ax, [XNk1[0], XNk1[1], 0.5*Xk[2] + 0.5*XNk1[2]], '$\Delta \mathring{Z}_k + \Delta t \mathring{V}^Z_k$', [0.0, 0.5*s, 0.0])
+
+
+        #vectors
+        drawArrow(ax, Xk, XNk)
+        drawArrow(ax, XNk, XNk1)
+        drawArrow(ax, Xk, 0.5*(Xk + XNk1))
+        textAtPoint(ax, 0.5*(Xk + XNk1), '${\mathbf{V}}_k^*$', [0.0, -0.5*s, 0.0])
+
+        #angles
+        drawArcScale(ax, Xk, XNk1, [XNk1[0], XNk1[1], Xk[2]], scale = 0.10)
+        textAtPoint(ax, Xk, '$\gamma^*_k$', [0.0, s, 0.0])
+
+        drawArcScale(ax, [XNk1[0], XNk1[1], 0.0], [Xk[0], Xk[1], 0.0], [Xk[0], XNk1[1], 0.0], scale = 0.15)
+        drawArcScale(ax, [XNk1[0], XNk1[1], 0.0], [Xk[0], Xk[1], 0.0], [Xk[0], XNk1[1], 0.0], scale = 0.18)
+        textAtPoint(ax, PZ(XNk1), '$\\theta^*_k$', [1.5*s, -s, 0])
+
+        #axes
+        drawArrow(ax, [-0.01, 0.0, 0.0], [1.0, 0.0, 0.0])
+        drawArrow(ax, [0.0, -0.01, 0.0], [0.0, 1.0, 0.0])
+        drawArrow(ax, [0.0, 0.0, -0.01], [0.0, 0.0, 1.0])
+        textAtPoint(ax, [1.0, 0.05, 0.0], '$x$')
+        textAtPoint(ax, [0.1, 1.0, 0.0], '$y$')
+        textAtPoint(ax, [0.05, 0.05, 1.0], '$z$')
+
+
+        ax.zaxis.set_major_locator(LinearLocator(10))
+        ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
+        ax.set_axis_off()
+        fig.tight_layout()
+        if show:
+            plt.show()
+        else:
+            plt.savefig(path)
+
+
+    def showmodel(self, path, show=False): # model scheme with basic notation
+        fig = plt.figure(figsize=(10, 6), dpi=200)
+        ax = fig.gca(projection='3d')
+        ax.view_init(31, 26)
+
+        # set good viewpoint
+        drawPoint(ax, [0.8, 0.8, 0.8], color = 'white', s = 0)
+
+
+        s = 0.05
+        Xk = np.array([0.7,0.2,0.2])
+        XNk1 = np.array([0.2,0.4,0.8])
+        v = 0.5*(Xk + XNk1)
+
+        #points
+        drawPoint(ax, Xk)
+        textAtPoint(ax, Xk, '${\mathbf{X}}_{k}$', [0,-s,-s])
+
+        #Xk projections
+        drawLine(ax, Xk, PZ(Xk), linestyle=':', linewidth=0.5)
+        drawLine(ax, PZ(Xk), Y(Xk), linestyle=':', linewidth=0.5)
+
+        #Xk to XNk1 and projections
+        drawLine(ax, PZ(Xk), PZ(v), linestyle=':', linewidth=0.5)
+        drawLine(ax, Xk, [v[0],v[1],Xk[2]], linestyle=':', linewidth=0.5)
+        drawLine(ax, v, PZ(v), linestyle=':', linewidth=0.5)
+
+        #vectors
+        drawArrow(ax, Xk, v)
+        textAtPoint(ax, v, '${\mathbf{V}}_k^*$', [0.0, -0.5*s, 0.0])
+
+        #angles
+        drawArcScale(ax, Xk, XNk1, [XNk1[0], XNk1[1], Xk[2]], scale = 0.10)
+        textAtPoint(ax, Xk, '$\gamma^*_k$', [-s, s, s])
+
+        drawArcScale(ax, PZ(Xk), PZ(v), Y(Xk), scale = 0.30)
+        drawArcScale(ax, PZ(Xk), PZ(v), Y(Xk), scale = 0.36)
+        textAtPoint(ax, PZ(Xk), '$\\theta^*_k$', [-s, 1.5*s, 1.5*s])
+
+        #axes
+        drawArrow(ax, [-0.01, 0.0, 0.0], [.5, 0.0, 0.0])
+        drawArrow(ax, [0.0, -0.005, 0.0], [0.0, .25, 0.0])
+        drawArrow(ax, [0.0, 0.0, -0.01], [0.0, 0.0, .5])
+        textAtPoint(ax, [.5, 0.025, 0.0], '$x$')
+        textAtPoint(ax, [0.1, .25, 0.0], '$y$')
+        textAtPoint(ax, [0.025, 0.025, .5], '$z$')
+
+
+        ax.zaxis.set_major_locator(LinearLocator(10))
+        ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
+        ax.set_axis_off()
+        fig.tight_layout()
+
+        if show:
+            plt.show()
+        else:
+            plt.savefig(path)
+        
+ 

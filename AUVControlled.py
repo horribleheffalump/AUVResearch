@@ -2,7 +2,7 @@ import numpy as np
 from math import *
 #from sklearn import linear_model as lm
 from scipy.optimize import fsolve
-from Sensor import *
+from SensorControlled import *
 
 
 class AUVControlled():
@@ -35,15 +35,19 @@ class AUVControlled():
         self.Sensors = []
 
     def addsensor(self, accuracy, Phi, Theta, seabed, estimateslope):      
-        self.Sensors.append(Sensor(self.X, self.X, accuracy, Phi, Theta, seabed, estimateslope))
+        Gamma = np.pi / 2.0 - Phi
+        self.Sensors.append(SensorControlled(self.X, self.X, self.UNominal(0.0), accuracy, Gamma, Theta, seabed, estimateslope))
         #print(Phi, Theta)
 
-    def step(self):
+    def step(self, XHat = []):
         #print(self.Sensors[0].X_estimate)
-        if len(self.Sensors) > 0:
-            XRealEstimate = np.mean(list(map(lambda x: x.X_estimate, self.Sensors)), axis=0)
+        if len(XHat) == 0:
+            if len(self.Sensors) > 0:
+                XRealEstimate = np.mean(list(map(lambda x: x.X_estimate, self.Sensors)), axis=0)
+            else:
+                XRealEstimate = self.XReal_estimate_history[self.k] + self.delta * self.VReal_history[self.k-1]
         else:
-            XRealEstimate = self.XReal_estimate_history[self.k] + self.delta * self.VReal_history[self.k-1]
+            XRealEstimate = XHat
         #print(self.XNominal_history[self.k])
         #print(XRealEstimate)
         Uopt = AUVControlled.UOptimal(self.XNominal_history[self.k] - XRealEstimate, self.v, self.UNominal(self.t), self.delta)        
@@ -53,7 +57,7 @@ class AUVControlled():
         self.delta_X = self.delta * VReal + self.sigmaW * np.array(np.random.normal(0,1,3))
         self.X = self.X + self.delta_X
         for s in self.Sensors:
-             s.step(self.X)
+             s.step(self.X, Uopt)
 
 
         self.t = self.t + self.delta
@@ -68,10 +72,15 @@ class AUVControlled():
         s0 = shift[0] + v * delta * cos(UNominal[0]) * cos(UNominal[1])
         s1 = shift[1] + v * delta * cos(UNominal[0]) * sin(UNominal[1])
         s2 = shift[2] + v * delta * sin(UNominal[0])
+        #s0 = shift[0] + v * delta * sin(UNominal[0]) * cos(UNominal[1])
+        #s1 = shift[1] + v * delta * sin(UNominal[0]) * sin(UNominal[1])
+        #s2 = shift[2] + v * delta * cos(UNominal[0])
         theta = atan2(s1, s0)
-        gamma = atan2(s2, cos(theta) * s0 + sin(theta) * s1)
+        gamma = atan2(s2,  s0 / cos(theta))
+        #gamma = atan2(cos(theta) * s0 + sin(theta) * s1, s2)
         return np.array([gamma, theta])
     @staticmethod
     def V(v, U):
         return v * np.array([np.cos(U[0]) * np.cos(U[1]), np.cos(U[0]) * np.sin(U[1]), np.sin(U[0])])
+        #return v * np.array([np.sin(U[0]) * np.cos(U[1]), np.sin(U[0]) * np.sin(U[1]), np.cos(U[0])])
         

@@ -13,14 +13,14 @@ T = 360.0
 delta = 1.0
 NBeams = 10
 #accuracy = [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
-#accuracy = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-#PhiBounds =     [[pc-pr,pc+pr],[pc-pr,pc+pr],[pc-pr,pc+pr],[pc-pr,pc+pr],[pc-pr,pc+pr],[pc-pr,pc+pr],[pc-pr,pc+pr],[pc-pr,pc+pr]]
-#ThetaBounds =   [[10.0+tr,10.0-tr],   [100.0+tr,100.0-tr],  [190.0+tr,190.0-tr],  [280.0+tr,280.0-tr], [55.0+tr,55.0-tr],   [145.0+tr,145.0-tr],  [235.0+tr,235.0-tr],  [325.0+tr,325.0-tr]]
+accuracy = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+PhiBounds =     [[pc-pr,pc+pr],[pc-pr,pc+pr],[pc-pr,pc+pr],[pc-pr,pc+pr],[pc-pr,pc+pr],[pc-pr,pc+pr],[pc-pr,pc+pr],[pc-pr,pc+pr]]
+ThetaBounds =   [[10.0+tr,10.0-tr],   [100.0+tr,100.0-tr],  [190.0+tr,190.0-tr],  [280.0+tr,280.0-tr], [55.0+tr,55.0-tr],   [145.0+tr,145.0-tr],  [235.0+tr,235.0-tr],  [325.0+tr,325.0-tr]]
 
-accuracy = [0.0, 0.0]
+#accuracy = [0.0, 0.0]
 #accuracy = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-PhiBounds =     [[pc-pr,pc+pr],[pc-pr,pc+pr]]
-ThetaBounds =   [[10.0+tr,10.0-tr],   [100.0+tr,100.0-tr]]
+#PhiBounds =     [[pc-pr,pc+pr],[pc-pr,pc+pr]]
+#ThetaBounds =   [[10.0+tr,10.0-tr],   [100.0+tr,100.0-tr]]
 
 ## for X
 #accuracy = [0.1]
@@ -85,7 +85,9 @@ seabed = Seabed()
 
 # single random trajectory
 X0 = [0.001 + 0.1 * np.random.normal(0,1),-0.0002 + 0.1 * np.random.normal(0,1),-10.0003 + 0.1 * np.random.normal(0,1)]
-DW = [0.05,0.05,0.05]
+#DW = [0.05,0.05,0.05]
+DW = [0.0,0.0,0.0]
+
 U = lambda t: np.pi * np.array([1 / 100.0 * np.cos(1.0 * np.pi * t/T), 1 / 3.0 * np.cos(4.0 * np.pi * t/T)])
 v = 2.0 # 5.0
 seabed = Seabed()
@@ -94,14 +96,14 @@ auv = AUVControlled(T, delta, X0, DW, U, v)
 test = testenvironmentControlled(T, delta, NBeams, accuracy, PhiBounds, ThetaBounds, auv, seabed, estimateslope)
 test.run()
 test.plotspeed([0,0,0], 'D:\\projects.git\\NavigationResearch\\results\\slope_known\\')
-test.plot3Dtrajectory([0,0,0], 'D:\\projects.git\\NavigationResearch\\results\\slope_known\\')
+test.plot3Dtrajectory([0], 'D:\\projects.git\\NavigationResearch\\results\\slope_known\\')
 test.plottrajectory('D:\\projects.git\\NavigationResearch\\results\\slope_known\\')
 estimateslope = True 
 auv = AUVControlled(T, delta, X0, DW, U, v)
 test = testenvironmentControlled(T, delta, NBeams, accuracy, PhiBounds, ThetaBounds, auv, seabed, estimateslope)
 test.run()
 test.plotspeed([0,0,0], 'D:\\projects.git\\NavigationResearch\\results\\slope_unknown\\')
-test.plot3Dtrajectory([0,0,0], 'D:\\projects.git\\NavigationResearch\\results\\slope_unknown\\')
+test.plot3Dtrajectory([0], 'D:\\projects.git\\NavigationResearch\\results\\slope_unknown\\')
 test.plottrajectory('D:\\projects.git\\NavigationResearch\\results\\slope_unknown\\')
 
 
@@ -121,7 +123,7 @@ test.plottrajectory('D:\\projects.git\\NavigationResearch\\results\\slope_unknow
 #test.plottrajectory3Dseabed()
 #test.plottrajectory('D:\\projects.git\\NavigationResearch\\results\\')
 
-test.plotseabedsequence('D:\\projects.git\\NavigationResearch\\results\\', 'none')
+#test.plotseabedsequence('D:\\projects.git\\NavigationResearch\\results\\', 'none')
 
 #test.crit()
 

@@ -36,7 +36,14 @@
     <Compile Include="CMNFTest.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DrawHelper.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="figures.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="runtestControlled.py" />
+    <Compile Include="SensorControlled.py" />
     <Compile Include="stats_speed.py">
       <SubType>Code</SubType>
     </Compile>
