@@ -2,12 +2,16 @@ import numpy as np
 
 class CMNFFilter():
     """Conditionnaly minimax nonlinear filter"""
-    def __init__(self, Xi, Zeta):
+    def __init__(self, Phi, Psi, DW, DNu, Xi, Zeta):
+        self.Phi = Phi
+        self.Psi = Psi
+        self.DW = DW
+        self.DNu = DNu
         self.Xi = Xi
         self.Zeta = Zeta
         self.tol = 1e-20
-    def EstimateParameters(self, States, Obs, XHat0, N):
-        M = States.shape[0] #number of samples
+    def EstimateParameters(self, X0, XHat0, N, M):
+        #M = States.shape[0] #number of samples
         self.FHat = [];
         self.fHat = [];
         self.HHat = [];
@@ -15,10 +19,11 @@ class CMNFFilter():
         self.KTilde = [];
         self.KHat = [];
         
+        x = np.array(list(map(lambda i: X0, range(0, M) )))
         xHat = np.array(list(map(lambda i: XHat0, range(0, M) )))
         for t in range(1, N+1):
-            x = States[:,t]
-            y = Obs[:,t]
+            x = np.array(list(map(lambda i: self.Phi(t, x[i], xHat[i]) + self.DW * np.array(np.random.normal(0.0,1.0, self.DW.shape[0])), range(0, M) )))
+            y = np.array(list(map(lambda i: self.Psi(t, x[i]) + self.DNu * np.array(np.random.normal(0.0,1.0, self.DNu.shape[0])), range(0, M) )))
             xiHat = np.array(list(map(lambda x : self.Xi(t,x), xHat)))
             CovXiHat = CMNFFilter.COV(xiHat, xiHat)
             InvCovXiHat = np.zeros_like(CovXiHat)
