@@ -392,6 +392,87 @@ class testenvironmentControlled():
         #fig.colorbar(surf, shrink=0.5, aspect=5)
         plt.show()
 
+
+    def showbearing(self, path, show=False): # model scheme with basic notation
+        fig = plt.figure(figsize=(10, 6), dpi=200)
+        ax = fig.gca(projection='3d')
+        ax.view_init(31, 26)
+
+        # set good viewpoint
+        drawPoint(ax, [1.1, 1.1, 1.1], color = 'white', s = 0)
+
+
+        s = 0.1
+        Xk = np.array([0.7,0.2,0.4])
+        XB = np.array([0.2,0.5,0.81])
+        xx = np.array([XB[0], Xk[1], 0.0])
+
+        #points
+        drawPoint(ax, Xk)
+        drawPoint(ax, XB)
+        textAtPoint(ax, Xk, '${\mathbf{X}}_{k}$', [0,-0.7*s,0.2*s])
+        textAtPoint(ax, XB, '${\mathbf{X}}_{B}$ (beacon)', [0,-0.7*s,0])
+
+
+        #Xk projections
+        drawLine(ax, Xk, PZ(Xk), linestyle=':', linewidth=0.5)
+        drawLine(ax, PZ(Xk), Y(Xk), linestyle=':', linewidth=0.5)
+        drawLine(ax, PZ(Xk), X(Xk), linestyle=':', linewidth=0.5)
+
+        #XB projections
+        drawLine(ax, XB, PZ(XB), linestyle=':', linewidth=0.5)
+        drawLine(ax, PZ(XB), Y(XB), linestyle=':', linewidth=0.5)
+        drawLine(ax, PZ(XB), X(XB), linestyle=':', linewidth=0.5)
+
+        #Xk to XB and projections
+        drawLine(ax, Xk, XB, linestyle=':', linewidth=0.5)
+        drawLine(ax, PZ(Xk), PZ(XB), linestyle=':', linewidth=0.5)
+        drawLine(ax, Xk, [XB[0],XB[1],Xk[2]], linestyle=':', linewidth=0.5)
+
+        #deltas
+        drawLine(ax, PZ(Xk), xx, linestyle='-', linewidth=0.5)
+        drawLine(ax, PZ(XB), xx, linestyle='-', linewidth=0.5)
+        drawLine(ax, XB, [XB[0],XB[1],Xk[2]], linestyle='-', linewidth=0.5)
+        textAtPoint(ax, 0.5*(PZ(Xk) + xx), '$X_B - X_k$', [0,-1.3*s,0])
+        textAtPoint(ax, 0.5*(PZ(XB) + xx), '$Y_B - Y_k$', [0.0,-0.4*s,0])
+        textAtPoint(ax, 0.5*(PZ(XB) + XB), '$Z_B - Z_k$', [0,0.2*s,1.3*s])
+
+
+        sX = np.arange(-0.1, 1.1, 1.0 / 100.0)
+        sY = np.arange(-0.1, 1.05, 1.0 / 100.0)
+        sX, sY = np.meshgrid(sX, sY)
+        sZ = XB[2] * np.ones_like(sX)
+        # Plot the surface.
+        surf = ax.plot_surface(sX, sY, sZ, cmap=cm.Blues, linewidth=0, antialiased=False, alpha=0.1)
+        ax.text(-0.1, 0.6, XB[2], 'sea surface', (0,1,0.1))
+
+
+        #angles
+        drawArcScale(ax, Xk, XB, [XB[0],XB[1],Xk[2]], scale = 0.10)
+        textAtPoint(ax, Xk, '$\lambda_k$', [-1.1*s, 0.4*s, 0.0])
+
+        drawArcScale(ax, PZ(Xk), PZ(XB),  [XB[0], Xk[1], 0], scale = 0.15)
+        drawArcScale(ax, PZ(Xk), PZ(XB),  [XB[0], Xk[1], 0], scale = 0.18)
+        textAtPoint(ax, PZ(Xk), '$\\varphi_k$', [0.3*s, 0.8*s, 0])
+
+        #axes
+        drawArrow(ax, [-0.01, 0.0, 0.0], [1.0, 0.0, 0.0])
+        drawArrow(ax, [0.0, -0.01, 0.0], [0.0, 1.0, 0.0])
+        drawArrow(ax, [0.0, 0.0, -0.01], [0.0, 0.0, 1.0])
+        textAtPoint(ax, [1.0, 0.05, 0.0], '$x$')
+        textAtPoint(ax, [0.1, 1.0, 0.0], '$y$')
+        textAtPoint(ax, [0.05, 0.05, 1.0], '$z$')
+
+
+        ax.zaxis.set_major_locator(LinearLocator(10))
+        ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
+        ax.set_axis_off()
+        fig.tight_layout()
+        if show:
+            plt.show()
+        else:
+            plt.savefig(path)
+
         
     def showsonarmodel(self, path, show=False): # model scheme with basic notation
         fig = plt.figure(figsize=(10, 6), dpi=200)
@@ -410,8 +491,9 @@ class testenvironmentControlled():
         #points
         drawPoint(ax, Xk)
         drawPoint(ax, x)
-        textAtPoint(ax, Xk, '${\mathbf{X}}_{k}$', [0,-s,-s])
-        textAtPoint(ax, x, '$(x,y,z)^T_{ij, k}$', [0,0,s])
+        textAtPoint(ax, Xk, '${\mathbf{X}}_{k}$', [0,-0.7*s,0])
+        textAtPoint(ax, (x+Xk)*0.5, '$L_{k}^{ij}$', [0,0.2*s,0])
+        textAtPoint(ax, x, '$\mathbf{x}_{k}^{ij}$', [0,0.2*s,0])
         for i in range(-2,3):
             for j in range(-2,3):
                 drawPoint(ax, x+np.array([i*0.05, j*0.05,0]),'black', 10, alpha=0.1)
@@ -447,11 +529,11 @@ class testenvironmentControlled():
 
         #angles
         drawArcScale(ax, Xk, x, [x[0],x[1],Xk[2]], scale = 0.10)
-        textAtPoint(ax, Xk, '$\gamma_k + \gamma_i$', [s, s, 0.0])
+        textAtPoint(ax, Xk, '$\gamma_k + \gamma^i$', [s, s, 0.0])
 
         drawArcScale(ax, PZ(Xk), PZ(x),  [x[0], Xk[1], 0], scale = 0.15)
         drawArcScale(ax, PZ(Xk), PZ(x),  [x[0], Xk[1], 0], scale = 0.18)
-        textAtPoint(ax, PZ(Xk), '$\\theta_k + \\theta_i$', [2.5*s, 0.5*s, 0])
+        textAtPoint(ax, PZ(Xk), '$\\theta_k + \\theta^j$', [2.5*s, 0.5*s, 0])
 
         #axes
         drawArrow(ax, [-0.01, 0.0, 0.0], [1.0, 0.0, 0.0])

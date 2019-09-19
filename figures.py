@@ -37,6 +37,7 @@ auv = AUVControlled(T, delta, X0, DW, U, v)
 test = testenvironmentControlled(T, delta, NBeams, accuracy, PhiBounds, ThetaBounds, auv, seabed, estimateslope)
 
 
+test.showbearing('D:\\Наука\\_Статьи\\__в работе\\navigation\\fig_4_bearing_orig.pdf', False)
 test.showsonarmodel('D:\\Наука\\_Статьи\\__в работе\\navigation\\fig_3_sensor_orig.pdf', False)
 test.showoptimalcontrol('D:\\Наука\\_Статьи\\__в работе\\navigation\\fig_2_optcontrol_orig.pdf', False)
 test.showmodel('D:\\Наука\\_Статьи\\__в работе\\navigation\\fig_1_model_orig.pdf', False)
