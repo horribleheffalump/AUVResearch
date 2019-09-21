@@ -8,8 +8,10 @@ import numpy as np
 
 from mpl_toolkits.mplot3d import Axes3D
 
+#import sys
+#sys.path.append('..\\Utils\\')
 
-from DrawHelper import *
+from Utils.DrawHelper import *
 
 from matplotlib import rc
 rc('font',**{'family':'serif'})

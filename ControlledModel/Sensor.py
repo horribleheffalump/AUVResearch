@@ -1,10 +1,10 @@
 import numpy as np
 from sklearn import linear_model as lm
 from scipy.optimize import fsolve
-from Seabed import *
-from SlopeApproximator import *
+from Seabed.Profile import *
+from Utils.SlopeApproximator import *
 
-class SensorControlled():
+class Sensor():
     """Acoustic sensor model"""
     def __init__(self, X0, Xhat0, U0, accuracy, Gamma, Theta, seabed, estimateslope = True):
         self.accuracy = accuracy

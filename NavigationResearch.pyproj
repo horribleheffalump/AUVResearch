@@ -23,50 +23,57 @@
     <InterpreterReference Include="Global|ContinuumAnalytics|Anaconda36-64" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="angles_optimization_power.py">
+    <Compile Include="BasicModel\angles_optimization_power.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="AUVControlled.py" />
-    <Compile Include="AUV.py">
+    <Compile Include="BasicModel\TestEnvironment.py" />
+    <Compile Include="BasicModel\__init__.py" />
+    <Compile Include="ControlledModel\AUV.py" />
+    <Compile Include="BasicModel\AUV.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="CMNFFilter.py">
+    <Compile Include="ControlledModel\TestEnvironment.py" />
+    <Compile Include="ControlledModel\__init__.py" />
+    <Compile Include="Filters\CMNFFilter.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="CMNFTest.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="DrawHelper.py">
+    <Compile Include="Filters\__init__.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="drawFiguresControlled.py">
+    <Compile Include="Seabed\__init__.py" />
+    <Compile Include="Utils\DrawHelper.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="modelIllustrationsControlled.py">
+    <Compile Include="ControlledModel\drawFigures.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ControlledModel\Illustrations.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="runtestControlled.py" />
-    <Compile Include="SensorControlled.py" />
-    <Compile Include="stats_speed.py">
+    <Compile Include="ControlledModel\Sensor.py" />
+    <Compile Include="BasicModel\stats_speed.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Sensor.py">
+    <Compile Include="BasicModel\Sensor.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="SlopeApproximator.py">
+    <Compile Include="Utils\SlopeApproximator.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="stats.py">
+    <Compile Include="BasicModel\stats.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="testenvironmentControlled.py" />
-    <Compile Include="testenvironment.py">
+    <Compile Include="runtestBasic.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="runtest.py">
+    <Compile Include="Seabed\Profile.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Seabed.py">
+    <Compile Include="Utils\__init__.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
@@ -76,6 +83,9 @@
   <ItemGroup>
     <Folder Include="BasicModel\" />
     <Folder Include="ControlledModel\" />
+    <Folder Include="Filters\" />
+    <Folder Include="Seabed\" />
+    <Folder Include="Utils\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
 </Project>

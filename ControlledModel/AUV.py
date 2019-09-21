@@ -2,10 +2,10 @@ import numpy as np
 from math import *
 #from sklearn import linear_model as lm
 from scipy.optimize import fsolve
-from SensorControlled import *
+from ControlledModel.Sensor import *
 
 
-class AUVControlled():
+class AUV():
     """AUV model"""
     def __init__(self, T, delta, X0, DW, UNominal, v):
         self.X = np.array(X0)
@@ -18,7 +18,7 @@ class AUVControlled():
         self.delta_X = np.zeros(self.X.shape)
 
         self.t_history = np.arange(0.0, T+delta, delta)
-        self.VNominal_history = np.array(list(map(lambda t: AUVControlled.V(v, UNominal(t)), self.t_history[:-1])))
+        self.VNominal_history = np.array(list(map(lambda t: AUV.V(v, UNominal(t)), self.t_history[:-1])))
         self.deltaXNominal_history = np.vstack((self.delta_X, delta * self.VNominal_history))
         self.XNominal_history = X0 + np.cumsum(self.deltaXNominal_history, axis = 0)
 
@@ -27,7 +27,7 @@ class AUVControlled():
         self.XReal_estimate_history = np.zeros((N+1, self.X.shape[0]))
         
         self.k = 0
-        self.VReal_history[self.k,:] = AUVControlled.V(v, UNominal(0.0))
+        self.VReal_history[self.k,:] = AUV.V(v, UNominal(0.0))
         self.XReal_history[self.k,:] = self.X 
         self.XReal_estimate_history[self.k,:] = self.X 
 
@@ -36,7 +36,7 @@ class AUVControlled():
 
     def addsensor(self, accuracy, Phi, Theta, seabed, estimateslope):      
         Gamma = np.pi / 2.0 - Phi
-        self.Sensors.append(SensorControlled(self.X, self.X, self.UNominal(0.0), accuracy, Gamma, Theta, seabed, estimateslope))
+        self.Sensors.append(Sensor(self.X, self.X, self.UNominal(0.0), accuracy, Gamma, Theta, seabed, estimateslope))
         #print(Phi, Theta)
 
     def step(self, XHat = []):
@@ -50,8 +50,8 @@ class AUVControlled():
             XRealEstimate = XHat
         #print(self.XNominal_history[self.k])
         #print(XRealEstimate)
-        Uopt = AUVControlled.UOptimal(self.XNominal_history[self.k] - XRealEstimate, self.v, self.UNominal(self.t), self.delta)        
-        VReal = AUVControlled.V(self.v, Uopt)
+        Uopt = AUV.UOptimal(self.XNominal_history[self.k] - XRealEstimate, self.v, self.UNominal(self.t), self.delta)        
+        VReal = AUV.V(self.v, Uopt)
         self.VReal_history[self.k,:] = VReal 
 
         self.delta_X = self.delta * VReal + self.sigmaW * np.array(np.random.normal(0,1,3))

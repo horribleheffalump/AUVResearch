@@ -1,6 +1,6 @@
-from testenvironmentControlled import *
-from SlopeApproximator import *
-from AUVControlled import *
+from ControlledModel.TestEnvironment import *
+from ControlledModel.AUV import *
+from Utils.SlopeApproximator import *
 #np.random.seed(2213123)
 
 
@@ -44,7 +44,7 @@ ThetaBounds =   [[10.0+tr,10.0-tr],   [100.0+tr,100.0-tr],  [190.0+tr,190.0-tr],
 #X0 = [10.0, 10.0, -10.0]
 #V = lambda t: np.array([0.3, 0.3, -0.02 * np.cos(0.1 * t)])
 estimateslope = False 
-seabed = Seabed()
+seabed = Profile()
 
 #X0 = [0.001 + 0.1 * np.random.normal(0,1),-0.0002 + 0.1 * np.random.normal(0,1),-10.0003 + 0.1 * np.random.normal(0,1)]
 #V = lambda t: np.array([0.5, 0.5 * np.cos(np.random.normal(0,1) * t), 0.02 * np.sin(np.random.normal(0,1) * t)])
@@ -90,17 +90,17 @@ DW = [0.0,0.0,0.0]
 
 U = lambda t: np.pi * np.array([1 / 100.0 * np.cos(1.0 * np.pi * t/T), 1 / 3.0 * np.cos(4.0 * np.pi * t/T)])
 v = 2.0 # 5.0
-seabed = Seabed()
+seabed = Profile()
 estimateslope = False 
-auv = AUVControlled(T, delta, X0, DW, U, v)
-test = testenvironmentControlled(T, delta, NBeams, accuracy, PhiBounds, ThetaBounds, auv, seabed, estimateslope)
+auv = AUV(T, delta, X0, DW, U, v)
+test = TestEnvironment(T, delta, NBeams, accuracy, PhiBounds, ThetaBounds, auv, seabed, estimateslope)
 test.run()
 test.plotspeed([0,0,0], 'D:\\projects.git\\NavigationResearch\\results\\slope_known\\')
 test.plot3Dtrajectory([0], 'D:\\projects.git\\NavigationResearch\\results\\slope_known\\')
 test.plottrajectory('D:\\projects.git\\NavigationResearch\\results\\slope_known\\')
 estimateslope = True 
-auv = AUVControlled(T, delta, X0, DW, U, v)
-test = testenvironmentControlled(T, delta, NBeams, accuracy, PhiBounds, ThetaBounds, auv, seabed, estimateslope)
+auv = AUV(T, delta, X0, DW, U, v)
+test = TestEnvironment(T, delta, NBeams, accuracy, PhiBounds, ThetaBounds, auv, seabed, estimateslope)
 test.run()
 test.plotspeed([0,0,0], 'D:\\projects.git\\NavigationResearch\\results\\slope_unknown\\')
 test.plot3Dtrajectory([0], 'D:\\projects.git\\NavigationResearch\\results\\slope_unknown\\')

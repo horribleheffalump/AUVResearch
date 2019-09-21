@@ -1,8 +1,8 @@
 import numpy as np
 from sklearn import linear_model as lm
 from scipy.optimize import fsolve
-from Seabed import *
-from SlopeApproximator import *
+from Seabed.Profile import *
+from Utils.SlopeApproximator import *
 
 class Sensor():
     """Acoustic sensor model"""

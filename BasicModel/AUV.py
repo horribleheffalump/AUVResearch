@@ -1,7 +1,7 @@
 import numpy as np
 #from sklearn import linear_model as lm
 from scipy.optimize import fsolve
-from Sensor import *
+from BasicModel.Sensor import *
 
 
 class AUV():

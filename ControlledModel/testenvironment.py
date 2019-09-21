@@ -1,4 +1,4 @@
-from AUV import *
+#from AUV import *
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
 
@@ -11,8 +11,6 @@ import datetime
 from mpl_toolkits.mplot3d import Axes3D
 
 
-from DrawHelper import *
-
 from matplotlib import rc
 rc('font',**{'family':'serif'})
 rc('text', usetex=True)
@@ -23,7 +21,7 @@ rc('text.latex',preamble=r'\usepackage[russian]{babel}')
 
 
 
-class testenvironmentControlled():
+class TestEnvironment():
     """AUV model"""
     def __init__(self, T, delta, NBeams, accuracy, PhiBounds, ThetaBounds, auv, seabed, estimateslope):
 
@@ -259,10 +257,10 @@ class testenvironmentControlled():
             bndY = [self.auv.X[1], self.auv.X[1]]
 
             for i, s in enumerate(self.auv.Sensors):
-                if isinstance(s, SensorControlled):
-                    bn, _, _, _, _ = s.beamnet(self.auv.X, self.auv.U(self.auv.t))
-                else:  
-                    bn, _, _, _, _ = s.beamnet(self.auv.X)
+                #if isinstance(s, SensorControlled):
+                bn, _, _, _, _ = s.beamnet(self.auv.X, self.auv.U(self.auv.t))
+                #else:  
+                #    bn, _, _, _, _ = s.beamnet(self.auv.X)
 
                 bn_X, bn_Y, bn_Z = bn[:,0], bn[:,1], bn[:,2]
                 _ = ax.scatter(bn_X, bn_Y, bn_Z, color = self.colors[i], s = 30)

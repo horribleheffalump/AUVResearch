@@ -3,12 +3,6 @@ from sklearn.linear_model import Ridge,LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import Pipeline
 
-import matplotlib.pyplot as plt
-from matplotlib import gridspec
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import cm
-from matplotlib.ticker import LinearLocator, FormatStrFormatter
-
 class SlopeApproximator():
     """Acoustic sensor model"""
     def __init__(self):

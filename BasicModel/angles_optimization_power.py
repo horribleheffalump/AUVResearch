@@ -1,6 +1,6 @@
 import concurrent.futures
 from testenvironment import *
-from SlopeApproximator import *
+from Utils.SlopeApproximator import *
 
 
 phi_c = np.arange(30.0, 60.0, 0.5)

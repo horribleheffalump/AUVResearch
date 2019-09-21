@@ -1,5 +1,7 @@
-from testenvironment import *
-from SlopeApproximator import *
+from BasicModel.AUV import *
+from BasicModel.TestEnvironment import *
+from Utils.SlopeApproximator import *
+from Seabed.Profile import *
 
 np.random.seed(2213123)
 
@@ -39,7 +41,7 @@ ThetaBounds =   [[10.0+tr,10.0-tr],   [100.0+tr,100.0-tr],  [190.0+tr,190.0-tr],
 #X0 = [10.0, 10.0, -10.0]
 #V = lambda t: np.array([0.3, 0.3, -0.02 * np.cos(0.1 * t)])
 estimateslope = False 
-seabed = Seabed()
+seabed = Profile()
 
 #X0 = [0.001 + 0.1 * np.random.normal(0,1),-0.0002 + 0.1 * np.random.normal(0,1),-10.0003 + 0.1 * np.random.normal(0,1)]
 #V = lambda t: np.array([0.5, 0.5 * np.cos(np.random.normal(0,1) * t), 0.02 * np.sin(np.random.normal(0,1) * t)])
@@ -86,15 +88,15 @@ vyc = np.random.normal(0,1)
 vzc = np.random.normal(0,1)
 V = lambda t: np.array([vx, 0.5 * np.cos(vyc * t), 0.02 * np.sin(vzc * t)])
 auv = AUV(X0, V, delta)
-seabed = Seabed()
+seabed = Profile()
 estimateslope = False 
-test = testenvironment(T, delta, NBeams, accuracy, PhiBounds, ThetaBounds, auv, seabed, estimateslope)
+test = TestEnvironment(T, delta, NBeams, accuracy, PhiBounds, ThetaBounds, auv, seabed, estimateslope)
 test.run()
 test.plotspeed([6,6,6], 'D:\\projects.git\\NavigationResearch\\results\\slope_known\\')
 test.plot3Dtrajectory([6,6,6], 'D:\\projects.git\\NavigationResearch\\results\\slope_known\\')
 test.plottrajectory('D:\\projects.git\\NavigationResearch\\results\\slope_known\\')
 estimateslope = True 
-test = testenvironment(T, delta, NBeams, accuracy, PhiBounds, ThetaBounds, auv, seabed, estimateslope)
+test = TestEnvironment(T, delta, NBeams, accuracy, PhiBounds, ThetaBounds, auv, seabed, estimateslope)
 test.run()
 test.plotspeed([6,6,6], 'D:\\projects.git\\NavigationResearch\\results\\slope_unknown\\')
 test.plot3Dtrajectory([6,6,6], 'D:\\projects.git\\NavigationResearch\\results\\slope_unknown\\')
