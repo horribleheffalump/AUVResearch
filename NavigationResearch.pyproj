@@ -39,7 +39,10 @@
     <Compile Include="DrawHelper.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="figures.py">
+    <Compile Include="drawFiguresControlled.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="modelIllustrationsControlled.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="runtestControlled.py" />
@@ -69,6 +72,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="requirements.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="BasicModel\" />
+    <Folder Include="ControlledModel\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
 </Project>

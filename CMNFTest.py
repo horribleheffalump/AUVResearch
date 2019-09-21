@@ -22,8 +22,6 @@ XNominal_history = X0 + np.cumsum(deltaXNominal_history, axis = 0)
 auv = AUVControlled(T, delta, X0, DW, U, v)
 test = testenvironmentControlled(T, delta, NBeams, accuracy, PhiBounds, ThetaBounds, auv, seabed, estimateslope)
 
-
-
 def Psi(k,X):
     Xb = [100,40,0]
     tanphi = (X[1] - Xb[1]) / (X[0] - Xb[0])
