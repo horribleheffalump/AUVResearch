@@ -40,7 +40,14 @@
     <Compile Include="CMNFTest.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Filters\KalmanFilter.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Filters\SimpleTest.py" />
     <Compile Include="Filters\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KalmanTest.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Seabed\__init__.py" />

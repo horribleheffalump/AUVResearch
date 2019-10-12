@@ -1,6 +1,7 @@
 import numpy as np
 from sklearn import linear_model as lm
 from scipy.optimize import fsolve
+from scipy.optimize import root
 from Seabed.Profile import *
 from Utils.SlopeApproximator import *
 
@@ -21,7 +22,8 @@ class Sensor():
             self.sa = SlopeApproximator()
 
         self.U_current = U0
-        self.L_current = np.zeros(Gamma.size * Theta.size)
+        self.L_zeros = np.zeros(Gamma.size * Theta.size);
+        self.L_current = self.L_zeros
         _, self.L_current, _, _, _ = self.beamnet(X0, U0)
 
 
@@ -40,7 +42,9 @@ class Sensor():
 
     def __l(self, X, e):
         func = lambda l : self.seabed.Z(X[0] + l * e[:,0], X[1] + l * e[:,1]) - (X[2] + l * e[:,2])
-        l_vec = fsolve(func, self.L_current)
+        #l_vec = fsolve(func, self.L_zeros, xtol = 1e-2) #self.L_current
+        l_vec = root(func, self.L_current).x
+        #print(l_vec2 - l_vec)
         return l_vec + np.random.normal(0, self.accuracy, l_vec.size)
     def __beamcoords(self, X, e, L):
         return X + L * e

@@ -6,11 +6,13 @@ class CMNFFilter():
         self.Phi = Phi
         self.Psi = Psi
         self.DW = DW
+        self.sigmaW = np.sqrt(DW)
         self.DNu = DNu
+        self.sigmaNu = np.sqrt(DNu)
         self.Xi = Xi
         self.Zeta = Zeta
         self.tol = 1e-20
-    def EstimateParameters(self, X0, XHat0, N, M):
+    def EstimateParameters(self, models, X0, XHat0, N, M):
         #M = States.shape[0] #number of samples
         self.FHat = [];
         self.fHat = [];
@@ -18,13 +20,15 @@ class CMNFFilter():
         self.hHat = [];
         self.KTilde = [];
         self.KHat = [];
-        
         x = np.array(list(map(lambda i: X0, range(0, M) )))
         xHat = np.array(list(map(lambda i: XHat0, range(0, M) )))
-        for t in range(1, N+1):
-            x = np.array(list(map(lambda i: self.Phi(t, x[i], xHat[i]) + self.DW * np.array(np.random.normal(0.0,1.0, self.DW.shape[0])), range(0, M) )))
-            y = np.array(list(map(lambda i: self.Psi(t, x[i]) + self.DNu * np.array(np.random.normal(0.0,1.0, self.DNu.shape[0])), range(0, M) )))
-            xiHat = np.array(list(map(lambda x : self.Xi(t,x), xHat)))
+        for t in range(1, N + 1):
+            print('estimate params CMNF t=',t)
+            for i in range(0, M):
+                models[i].step(xHat[i])
+            x = np.array(list(map(lambda i: self.Phi(models[i], t-1, x[i], xHat[i]) + self.sigmaW * np.array(np.random.normal(0.0,1.0, self.DW.shape[0])), range(0, M) )))
+            y = np.array(list(map(lambda i: self.Psi(models[i], t, x[i]) + self.sigmaNu * np.array(np.random.normal(0.0,1.0, self.DNu.shape[0])), range(0, M) )))
+            xiHat = np.array(list(map(lambda i : self.Xi(models[i], t-1, xHat[i]), range(0, M))))
             CovXiHat = CMNFFilter.COV(xiHat, xiHat)
             InvCovXiHat = np.zeros_like(CovXiHat)
             if (np.linalg.norm(CovXiHat) > self.tol):
@@ -35,7 +39,7 @@ class CMNFFilter():
             kTilde = CMNFFilter.COV(x, x) - np.dot(F, CMNFFilter.COV(x, xiHat).T)
 
             xTilde = np.array(list(map(lambda i : np.dot(F, xiHat[i]) + f, range(0,M))))
-            zetaTilde = np.array(list(map(lambda i : self.Zeta(t, xTilde[i], y[i]), range(0,M))))
+            zetaTilde = np.array(list(map(lambda i : self.Zeta(models[i], t, xTilde[i], y[i]), range(0,M))))
             delta_x_xTilde = np.array(list(map(lambda i : x[i] - xTilde[i], range(0,M))))
             delta_by_zetaTilde = np.array(list(map(lambda i : np.outer(delta_x_xTilde[i], zetaTilde[i]), range(0,M))))
 
@@ -58,9 +62,9 @@ class CMNFFilter():
             self.KTilde.append(kTilde)
             self.KHat.append(kHat)
 
-    def Step(self, k, y, xHat_):
-        xTilde = np.dot(self.FHat[k], self.Xi(k, xHat_)) + self.fHat[k]
-        xHat = xTilde + np.dot(self.HHat[k], self.Zeta(k, xTilde, y)) + self.hHat[k]
+    def Step(self, model, k, y, xHat_):
+        xTilde = np.dot(self.FHat[k], self.Xi(model, k-1, xHat_)) + self.fHat[k]
+        xHat = xTilde + np.dot(self.HHat[k], self.Zeta(model, k, xTilde, y)) + self.hHat[k]
         return xHat
 
     @staticmethod
