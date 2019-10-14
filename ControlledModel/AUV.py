@@ -48,7 +48,7 @@ class AUV():
         self.X = self.X + dX
 
         for s in self.Sensors:
-             s.step(self.X, self.UOptimal(self.k, self.X))
+             s.step(self.X, self.UOptimal(self.k, XHat))
              
         self.t = self.t + self.delta
         self.k = self.k + 1

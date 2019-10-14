@@ -5,8 +5,8 @@ from ControlledModel.AUV import *
 from Filters.CMNFFilter import *
 from math import *
 #np.random.seed(2213123)
-TT = 360.0
-T = 360.0
+TT = 300.0
+T = 300.0
 delta = 1.0
 N = int(T / delta)
 
@@ -89,7 +89,7 @@ def Zeta(auv, k, X, y):
 
 
 
-M = 1000
+M = 10000
 
 auvs = np.array(list(map(lambda i: createAUV(), range(0, M) )))
 
@@ -97,7 +97,7 @@ cmnf = CMNFFilter(Phi, Psi, DW, DNu, Xi, Zeta)
 cmnf.EstimateParameters(auvs, X0, X0, N, M)
 
 
-M = 1000
+M = 100000
 
 EstimateError = np.zeros((M,N+1,X0.shape[0]))
 ControlError = np.zeros((M,N+1,X0.shape[0]))

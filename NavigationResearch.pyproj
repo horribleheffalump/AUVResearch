@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{82c268e0-cfaf-415e-aa32-7a50b3f1c66b}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>CMNFTest.py</StartupFile>
+    <StartupFile>PseudoKalmanTest.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -47,7 +47,8 @@
     <Compile Include="Filters\__init__.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="KalmanTest.py">
+    <Compile Include="EKFTest.py" />
+    <Compile Include="PseudoKalmanTest.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Seabed\__init__.py" />

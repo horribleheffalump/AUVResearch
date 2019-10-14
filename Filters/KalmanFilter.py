@@ -16,9 +16,9 @@ class KalmanFilter():
         self.DNu = DNu
 
     def Step(self, model, k, y, xHat_, kHat_):
-        F = self.dPhi1(model, k, xHat_)
-        Q = self.Phi2(model, k, xHat_) @ self.DW @ self.Phi2(model, k, xHat_).T
-        xTilde = self.Phi1(model, k, xHat_) + self.Phi2(model, k, xHat_) @ self.MW;
+        F = self.dPhi1(model, k-1, xHat_)
+        Q = self.Phi2(model, k-1, xHat_) @ self.DW @ self.Phi2(model, k-1, xHat_).T
+        xTilde = self.Phi1(model, k-1, xHat_) + self.Phi2(model, k-1, xHat_) @ self.MW;
         kTilde = F @ kHat_ @ F.T + Q; 
 
         H = self.dPsi1(model, k, xTilde, y);
