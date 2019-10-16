@@ -55,13 +55,13 @@ def createAUV(X0):
     #    auv.addsensor(accuracy[i], PhiGrad / 180.0 * np.pi, ThetaGrad / 180.0 * np.pi, seabed, estimateslope = True)
     return auv
 
-def Psi(auv,k,X):
+def Psi(auv,k,X,y):
     tanphi = (X[1] - Xb[:,1]) / (X[0] - Xb[:,0])
     tanlambda = (X[2] - Xb[:,2]) / np.sqrt((X[0] - Xb[:,0]) * (X[0] - Xb[:,0]) + (X[1] - Xb[:,1]) * (X[1] - Xb[:,1]))
     return np.hstack((tanphi,tanlambda)) #np.array([tanphi, tanlambda])
 
 def Angles(X):
-    return Psi([], [], X) + sigmaNu * np.array(np.random.normal(0.0,1.0, DNu.shape[0]))
+    return Psi([], [], X, []) + sigmaNu * np.array(np.random.normal(0.0,1.0, DNu.shape[0]))
 
 def Phi(auv, k, X, XHat):
     deltaX, _ = auv.staterecalc(k, XHat)
@@ -77,7 +77,7 @@ def Xi(auv, k, XHat):
         return Phi(auv, k, XHat, XHat)
 
 def Zeta(auv, k, X, y):
-    return y - Psi(auv, k, X)
+    return y - Psi(auv, k, X, y)
 
 
 
@@ -105,7 +105,9 @@ for m in range(0,M):
         auv.step(XHat[i])   
         y = Angles(auv.X)
         X.append(auv.X)
-        XHat.append(cmnf.Step(auv, i, y, XHat[i]))
+        #XHat.append(cmnf.Step(auv, i, y, XHat[i]))
+        XHat_, _ = cmnf.Step(auv, i+1, y, XHat[i], [])
+        XHat.append(XHat_)
         #EstimateError += 1.0 / N * np.linalg.norm(auv.X - XHat[i + 1])
     XHat = np.array(XHat)
     X = np.array(X)

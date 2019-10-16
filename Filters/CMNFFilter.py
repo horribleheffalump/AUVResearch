@@ -28,7 +28,7 @@ class CMNFFilter():
             for i in range(0, M):
                 models[i].step(xHat[i])
             x = np.array(list(map(lambda i: self.Phi(models[i], t-1, x[i], xHat[i]) + self.sigmaW * np.array(np.random.normal(0.0,1.0, self.DW.shape[0])), range(0, M) )))
-            y = np.array(list(map(lambda i: self.Psi(models[i], t, x[i]) + self.sigmaNu * np.array(np.random.normal(0.0,1.0, self.DNu.shape[0])), range(0, M) )))
+            y = np.array(list(map(lambda i: self.Psi(models[i], t, x[i], []) + self.sigmaNu * np.array(np.random.normal(0.0,1.0, self.DNu.shape[0])), range(0, M) )))
             xiHat = np.array(list(map(lambda i : self.Xi(models[i], t-1, xHat[i]), range(0, M))))
             CovXiHat = CMNFFilter.COV(xiHat, xiHat)
             InvCovXiHat = np.zeros_like(CovXiHat)
@@ -63,10 +63,12 @@ class CMNFFilter():
             self.KTilde.append(kTilde)
             self.KHat.append(kHat)
 
-    def Step(self, model, k, y, xHat_):
+    def Step(self, model, k, y, xHat_, kHat_):
+        if (k == len(self.FHat)): ## OMG!! This is a dirty trick to make the CMNF time scale in line with Kalman filter timescale. Otherwise we need to calculate CMNF params on one additional step.
+            k -= 1 
         xTilde = np.dot(self.FHat[k], self.Xi(model, k-1, xHat_)) + self.fHat[k]
         xHat = xTilde + np.dot(self.HHat[k], self.Zeta(model, k, xTilde, y)) + self.hHat[k]
-        return xHat
+        return xHat, self.KHat[k]
 
     @staticmethod
     def COV(X,Y):

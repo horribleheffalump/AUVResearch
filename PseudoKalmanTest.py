@@ -131,7 +131,7 @@ def PseudoMeasurements(y):
 
 kalman = KalmanFilter(Phi1, dPhi1, Phi2, Psi1, dPsi1, Psi2, np.array([0.0,0.0,0.0]), np.diag(DW), np.zeros(2 * Xb.shape[0]), np.diag(DNu))
 
-M = 1000
+M = 100
 
 EstimateError = np.zeros((M,N+1,mX0.shape[0]))
 ControlError = np.zeros((M,N+1,mX0.shape[0]))
