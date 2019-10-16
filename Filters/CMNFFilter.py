@@ -12,7 +12,7 @@ class CMNFFilter():
         self.Xi = Xi
         self.Zeta = Zeta
         self.tol = 1e-20
-    def EstimateParameters(self, models, X0, XHat0, N, M):
+    def EstimateParameters(self, models, X0all, XHat0, N, M):
         #M = States.shape[0] #number of samples
         self.FHat = [];
         self.fHat = [];
@@ -20,7 +20,8 @@ class CMNFFilter():
         self.hHat = [];
         self.KTilde = [];
         self.KHat = [];
-        x = np.array(list(map(lambda i: X0, range(0, M) )))
+        #x = np.array(list(map(lambda i: X0, range(0, M) )))
+        x = X0all
         xHat = np.array(list(map(lambda i: XHat0, range(0, M) )))
         for t in range(1, N + 1):
             print('estimate params CMNF t=',t)

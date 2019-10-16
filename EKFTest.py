@@ -29,14 +29,6 @@ sigmaNu0 = np.tan(5 * np.pi / 180.0 / 60.0) # 5 arc minutes
 sigmaNu = sigmaNu0 * np.ones(2 * Xb.shape[0])
 DNu = np.power(sigmaNu, 2.0)
 
-dX = mX0 - Xb
-pdX = dX[:,:-1]
-sign_sin_phi = np.sign(pdX[:,1] / np.linalg.norm(pdX, axis = 1))
-sign_cos_phi = np.sign(pdX[:,0] / np.linalg.norm(pdX, axis = 1))
-sign_sin_lambda = np.sign(dX[:,2] / np.linalg.norm(dX, axis = 1))
-sign_cos_lambda = np.sign(np.linalg.norm(pdX, axis = 1) / np.linalg.norm(dX, axis = 1))
-
-
 pc=28.0
 pr=20.0
 tr=20.0
@@ -136,28 +128,14 @@ for m in range(0,M):
     XHat = np.array(XHat)
     KHat = np.array(KHat)
     X = np.array(X)
-    #EstimateError[m,:,:] =  auv.XReal_history - XHat
-    #ControlError[m,:,:] =   auv.XReal_history - auv.XNominal_history
     EstimateError[m,:,:] =  X - XHat
-    #ControlError[m,:,:] =   auv.XReal_history - auv.XNominal_history
+    ControlError[m,:,:] =   X - auv.XNominal_history
 
 MEstimateError = np.mean(EstimateError, axis = 0)
 stdEstimateError = np.std(EstimateError, axis = 0)
 
-#MControlError = np.mean(ControlError, axis = 0)
-#stdControlError = np.std(ControlError, axis = 0)
-
-f = plt.figure(num=None, figsize=(15,5), dpi=200, facecolor='w', edgecolor='k')
-gs = gridspec.GridSpec(1, 3, width_ratios=[1, 1, 1])     
-gs.update(left=0.03, bottom=0.05, right=0.99, top=0.99, wspace=0.1, hspace=0.1)    
-
-
-for k in range(0,3):
-    ax = plt.subplot(gs[k])
-    ax.plot(t_history, MEstimateError[:,k], color='black', linewidth=2.0)
-    ax.plot(t_history, stdEstimateError[:,k], color='red', linewidth=2.0)
-    #ax.plot(t_history, np.sqrt(KHat)[:,k,k], color='blue', linewidth=2.0)
-plt.show()
+MControlError = np.mean(ControlError, axis = 0)
+stdControlError = np.std(ControlError, axis = 0)
 
 f = plt.figure(num=None, figsize=(15,5), dpi=200, facecolor='w', edgecolor='k')
 gs = gridspec.GridSpec(1, 3, width_ratios=[1, 1, 1])     
@@ -165,17 +143,15 @@ gs.update(left=0.03, bottom=0.05, right=0.99, top=0.99, wspace=0.1, hspace=0.1)
 
 for k in range(0,3):
     ax = plt.subplot(gs[k])
-    ax.plot(t_history, X[:,k], color='black', linewidth=2.0)
-    ax.plot(t_history, XHat[:,k], color='red', linewidth=2.0)
+    ax.plot(auv.t_history, MEstimateError[:,k], color='black', linewidth=2.0)
+    ax.plot(auv.t_history, stdEstimateError[:,k], color='red', linewidth=2.0)
 plt.show()
 
-
-
-#for k in range(0,3):
-#    ax = plt.subplot(gs[k])
-#    ax.plot(auv.t_history, MControlError[:,k], color='black', linewidth=2.0)
-#    ax.plot(auv.t_history, stdControlError[:,k], color='red', linewidth=2.0)
-#plt.show()
+for k in range(0,3):
+    ax = plt.subplot(gs[k])
+    ax.plot(auv.t_history, MControlError[:,k], color='black', linewidth=2.0)
+    ax.plot(auv.t_history, stdControlError[:,k], color='red', linewidth=2.0)
+plt.show()
 
 for k in range(0,3):
     ax = plt.subplot(gs[k])
