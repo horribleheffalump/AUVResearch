@@ -27,8 +27,8 @@ minX = np.min(XNominal_history, axis = 0)
 #Xb = np.array([[maxX[0] + 100, maxX[1] + 100, 0.0], [maxX[0] + 100, minX[1] - 100, 0.0], [minX[0] - 100, maxX[1] + 100, 0.0], [minX[0] - 100, minX[1] - 100, 0.0]])
 Xb = np.array([[maxX[0] + 100, maxX[1] + 100, 0.0]])
 
-sigmaNu0 = np.tan(5 * np.pi / 180.0 / 60.0) # 5 arc minutes
-#sigmaNu0 = np.tan(0.5 * np.pi / 180.0) # 0.5 degree
+#sigmaNu0 = np.tan(5 * np.pi / 180.0 / 60.0) # 5 arc minutes
+sigmaNu0 = np.tan(0.5 * np.pi / 180.0) # 0.5 degree
 sigmaNu = sigmaNu0 * np.ones(2 * Xb.shape[0])
 DNu = np.power(sigmaNu, 2.0)
 
@@ -150,24 +150,24 @@ def Zeta(auv, k, X, y):
 
 
 
-Mtrain = 1000
+Mtrain = 3000
 
 X0all = np.array(list(map(lambda i: mX0 + sigmaW * np.array(np.random.normal(0,1,3)), range(0, Mtrain) )))
 auvs = np.array(list(map(lambda i: createAUV(X0all[i]), range(0, Mtrain) )))
 
-#cmnf = CMNFFilter(Phi1, Psi1, DW, DNu, Xi, Zeta)
-#cmnf.EstimateParameters(auvs, X0all, mX0, N, Mtrain)
-#cmnf.SaveParameters("D:\\Наука\\_Статьи\\__в работе\\2019 - Sensors - Navigation\\data\\byvirt\\_[param].npy")
+cmnf = CMNFFilter(Phi1, Psi1, DW, DNu, Xi, Zeta)
+cmnf.EstimateParameters(auvs, X0all, mX0, N, Mtrain)
+cmnf.SaveParameters("D:\\Наука\\_Статьи\\__в работе\\2019 - Sensors - Navigation\\data\\byvirt\\_[param].npy")
 #cmnf.LoadParameters("D:\\Наука\\_Статьи\\__в работе\\2019 - Sensors - Navigation\\data\\byvirt\\_[param].npy")
 
 kalman = KalmanFilter(Phi1, dPhi1, Phi2, Psi1, dPsi1, Psi2, np.array([0.0,0.0,0.0]), np.diag(DW), np.zeros(2 * Xb.shape[0]), np.diag(DNu))
 
 pseudo = KalmanFilter(Phi1, dPhi1, Phi2, Psi1Pseudo, dPsi1Pseudo, Psi2Pseudo, np.array([0.0,0.0,0.0]), np.diag(DW), np.zeros(2 * Xb.shape[0]), np.diag(DNu))
 
-M = 1000
+M = 10000
 
-filters = [kalman, pseudo]
-needsPseudoMeasurements = [False, True]
+filters = [cmnf, kalman, pseudo]
+needsPseudoMeasurements = [False, False, True]
 colors = ['red', 'green', 'blue']
 names = ['cmnf', 'kalman', 'pseudo']
 
@@ -214,7 +214,6 @@ for m in range(0,M):
         np.savetxt(EstimateErrorFileNameTemplate.replace('[filter]',names[k]).replace('[pathnum]', str(m).zfill(int(np.log10(M)))),  EstimateError[k][m,:,:], fmt='%f')
         np.savetxt(ControlErrorFileNameTemplate.replace('[filter]',names[k]).replace('[pathnum]', str(m).zfill(int(np.log10(M)))),  ControlError[k][m,:,:], fmt='%f')
 
-
 mEstimateError = [None] * len(filters)
 stdEstimateError = [None] * len(filters)
 mControlError = [None] * len(filters)
@@ -223,12 +222,32 @@ stdControlError = [None] * len(filters)
 for k in range(0, len(filters)):
     mEstimateError[k] = np.mean(EstimateError[k], axis = 0)
     stdEstimateError[k] = np.std(EstimateError[k], axis = 0)
-    np.savetxt(EstimateErrorFileNameTemplate.replace('[filter]',names[k]).replace('[pathnum]', 'mean'),  mEstimateError[k], fmt='%f')
-    np.savetxt(EstimateErrorFileNameTemplate.replace('[filter]',names[k]).replace('[pathnum]', 'std'),  stdEstimateError[k], fmt='%f')
 
 for k in range(0, len(filters)):
     mControlError[k] = np.mean(ControlError[k], axis = 0)
     stdControlError[k] = np.std(ControlError[k], axis = 0)
-    np.savetxt(ControlErrorFileNameTemplate.replace('[filter]',names[k]).replace('[pathnum]', 'mean'),  mControlError[k], fmt='%f')
-    np.savetxt(ControlErrorFileNameTemplate.replace('[filter]',names[k]).replace('[pathnum]', 'std'),  stdControlError[k], fmt='%f')
 
+
+
+
+f = plt.figure(num=None, figsize=(15,5), dpi=200, facecolor='w', edgecolor='k')
+gs = gridspec.GridSpec(1, 3, width_ratios=[1, 1, 1])     
+gs.update(left=0.03, bottom=0.05, right=0.99, top=0.99, wspace=0.1, hspace=0.1)    
+
+for k in range(0,len(filters)):
+    for i in range(0,3):
+        ax = plt.subplot(gs[i])
+        ax.plot(t_history, stdEstimateError[k][:,i], color=colors[k], linewidth=2.0)
+        ax.plot(t_history, mEstimateError[k][:,i], color=colors[k], linewidth=1.0, linestyle = 'dotted')
+plt.show()
+
+f = plt.figure(num=None, figsize=(15,5), dpi=200, facecolor='w', edgecolor='k')
+gs = gridspec.GridSpec(1, 3, width_ratios=[1, 1, 1])     
+gs.update(left=0.03, bottom=0.05, right=0.99, top=0.99, wspace=0.1, hspace=0.1)    
+
+for k in range(0,len(filters)):
+    for i in range(0,3):
+        ax = plt.subplot(gs[i])
+        ax.plot(t_history, stdControlError[k][:,i], color=colors[k], linewidth=2.0)
+        ax.plot(t_history, mControlError[k][:,i], color=colors[k], linewidth=1.0, linestyle = 'dotted')
+plt.show()

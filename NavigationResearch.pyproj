@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{82c268e0-cfaf-415e-aa32-7a50b3f1c66b}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>TestCommon.py</StartupFile>
+    <StartupFile>GatherStats.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -48,6 +48,12 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="EKFTest.py" />
+    <Compile Include="GatherStats.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="PlotStats.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="PseudoKalmanTest.py">
       <SubType>Code</SubType>
     </Compile>

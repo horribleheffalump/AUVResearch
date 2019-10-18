@@ -47,12 +47,12 @@ seabed = Profile()
 
 def createAUV(X0):
     auv = AUV(T, delta, X0, DW, U)
-    #for i in range(0, accuracy.size):
-    #    ph = PhiBounds[i,:]
-    #    th = ThetaBounds[i,:]
-    #    PhiGrad = np.append(np.arange(ph[0], ph[1], (ph[1] - ph[0]) / NBeams), ph[1])
-    #    ThetaGrad = np.append(np.arange(th[0], th[1], (th[1] - th[0]) / NBeams), th[1])
-    #    auv.addsensor(accuracy[i], PhiGrad / 180.0 * np.pi, ThetaGrad / 180.0 * np.pi, seabed, estimateslope = True)
+    for i in range(0, accuracy.size):
+        ph = PhiBounds[i,:]
+        th = ThetaBounds[i,:]
+        PhiGrad = np.append(np.arange(ph[0], ph[1], (ph[1] - ph[0]) / NBeams), ph[1])
+        ThetaGrad = np.append(np.arange(th[0], th[1], (th[1] - th[0]) / NBeams), th[1])
+        auv.addsensor(accuracy[i], PhiGrad / 180.0 * np.pi, ThetaGrad / 180.0 * np.pi, seabed, estimateslope = True)
     return auv
 
 
@@ -102,7 +102,7 @@ def Phi2(auv, k, X):
 
 kalman = KalmanFilter(Phi1, dPhi1, Phi2, Psi1, dPsi1, Psi2, np.array([0.0,0.0,0.0]), np.diag(DW), np.zeros(2 * Xb.shape[0]), np.diag(DNu))
 
-M = 100
+M = 3
 
 EstimateError = np.zeros((M,N+1,mX0.shape[0]))
 ControlError = np.zeros((M,N+1,mX0.shape[0]))

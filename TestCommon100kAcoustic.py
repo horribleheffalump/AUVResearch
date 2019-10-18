@@ -24,11 +24,10 @@ XNominal_history = mX0 + np.cumsum(deltaXNominal_history, axis = 0)
 
 maxX = np.max(XNominal_history, axis = 0)
 minX = np.min(XNominal_history, axis = 0)
-#Xb = np.array([[maxX[0] + 100, maxX[1] + 100, 0.0], [maxX[0] + 100, minX[1] - 100, 0.0], [minX[0] - 100, maxX[1] + 100, 0.0], [minX[0] - 100, minX[1] - 100, 0.0]])
-Xb = np.array([[maxX[0] + 100, maxX[1] + 100, 0.0]])
+Xb = np.array([[maxX[0] + 100, maxX[1] + 100, 0.0], [maxX[0] + 100, minX[1] - 100, 0.0], [minX[0] - 100, maxX[1] + 100, 0.0], [minX[0] - 100, minX[1] - 100, 0.0]])
 
-sigmaNu0 = np.tan(5 * np.pi / 180.0 / 60.0) # 5 arc minutes
-#sigmaNu0 = np.tan(0.5 * np.pi / 180.0) # 0.5 degree
+#sigmaNu0 = np.tan(5 * np.pi / 180.0 / 60.0) # 5 arc minutes
+sigmaNu0 = np.tan(0.5 * np.pi / 180.0) # 0.5 degree
 sigmaNu = sigmaNu0 * np.ones(2 * Xb.shape[0])
 DNu = np.power(sigmaNu, 2.0)
 
@@ -73,12 +72,12 @@ seabed = Profile()
 
 def createAUV(X0):
     auv = AUV(T, delta, X0, DW, U)
-    #for i in range(0, accuracy.size):
-    #    ph = PhiBounds[i,:]
-    #    th = ThetaBounds[i,:]
-    #    PhiGrad = np.append(np.arange(ph[0], ph[1], (ph[1] - ph[0]) / NBeams), ph[1])
-    #    ThetaGrad = np.append(np.arange(th[0], th[1], (th[1] - th[0]) / NBeams), th[1])
-    #    auv.addsensor(accuracy[i], PhiGrad / 180.0 * np.pi, ThetaGrad / 180.0 * np.pi, seabed, estimateslope = True)
+    for i in range(0, accuracy.size):
+        ph = PhiBounds[i,:]
+        th = ThetaBounds[i,:]
+        PhiGrad = np.append(np.arange(ph[0], ph[1], (ph[1] - ph[0]) / NBeams), ph[1])
+        ThetaGrad = np.append(np.arange(th[0], th[1], (th[1] - th[0]) / NBeams), th[1])
+        auv.addsensor(accuracy[i], PhiGrad / 180.0 * np.pi, ThetaGrad / 180.0 * np.pi, seabed, estimateslope = True)
     return auv
 
 def Psi1(auv, k, X, y):
@@ -150,37 +149,42 @@ def Zeta(auv, k, X, y):
 
 
 
-Mtrain = 1000
+Mtrain = 100000
 
 X0all = np.array(list(map(lambda i: mX0 + sigmaW * np.array(np.random.normal(0,1,3)), range(0, Mtrain) )))
 auvs = np.array(list(map(lambda i: createAUV(X0all[i]), range(0, Mtrain) )))
 
-#cmnf = CMNFFilter(Phi1, Psi1, DW, DNu, Xi, Zeta)
-#cmnf.EstimateParameters(auvs, X0all, mX0, N, Mtrain)
-#cmnf.SaveParameters("D:\\Наука\\_Статьи\\__в работе\\2019 - Sensors - Navigation\\data\\byvirt\\_[param].npy")
-#cmnf.LoadParameters("D:\\Наука\\_Статьи\\__в работе\\2019 - Sensors - Navigation\\data\\byvirt\\_[param].npy")
+cmnf = CMNFFilter(Phi1, Psi1, DW, DNu, Xi, Zeta)
+cmnf.EstimateParameters(auvs, X0all, mX0, N, Mtrain)
+cmnf.SaveParameters("D:\\Наука\\_Статьи\\__в работе\\2019 - Sensors - Navigation\\data\\acoustic\\_[param].npy")
+#cmnf.LoadParameters("D:\\Наука\\_Статьи\\__в работе\\2019 - Sensors - Navigation\\data\\acoustic\\_[param].npy")
 
 kalman = KalmanFilter(Phi1, dPhi1, Phi2, Psi1, dPsi1, Psi2, np.array([0.0,0.0,0.0]), np.diag(DW), np.zeros(2 * Xb.shape[0]), np.diag(DNu))
 
 pseudo = KalmanFilter(Phi1, dPhi1, Phi2, Psi1Pseudo, dPsi1Pseudo, Psi2Pseudo, np.array([0.0,0.0,0.0]), np.diag(DW), np.zeros(2 * Xb.shape[0]), np.diag(DNu))
 
-M = 1000
+M = 100000
 
-filters = [kalman, pseudo]
-needsPseudoMeasurements = [False, True]
-colors = ['red', 'green', 'blue']
-names = ['cmnf', 'kalman', 'pseudo']
+#filters = [cmnf, kalman, pseudo]
+#needsPseudoMeasurements = [False, False, True]
+#colors = ['red', 'green', 'blue']
+#names = ['cmnf', 'kalman', 'pseudo']
+
+filters = [cmnf]
+needsPseudoMeasurements = [False]
+colors = ['red']
+names = ['cmnf']
+
 
 EstimateError = [None] * len(filters)
 ControlError = [None] * len(filters)
 
-EstimateErrorFileNameTemplate = "D:\\Наука\\_Статьи\\__в работе\\2019 - Sensors - Navigation\\data\\byvirt\\estimate\\estimate_error_[filter]_[pathnum].txt"
-ControlErrorFileNameTemplate = "D:\\Наука\\_Статьи\\__в работе\\2019 - Sensors - Navigation\\data\\byvirt\\control\\control_error_[filter]_[pathnum].txt"
+EstimateErrorFileNameTemplate = "D:\\Наука\\_Статьи\\__в работе\\2019 - Sensors - Navigation\\data\\acoustic\\estimate\\estimate_error_[filter]_[pathnum].txt"
+ControlErrorFileNameTemplate = "D:\\Наука\\_Статьи\\__в работе\\2019 - Sensors - Navigation\\data\\acoustic\\control\\control_error_[filter]_[pathnum].txt"
 
 for k in range(0, len(filters)):
     EstimateError[k] = np.zeros((M, N+1, mX0.shape[0]))
     ControlError[k] = np.zeros((M, N+1, mX0.shape[0]))
-
 
 for m in range(0,M):
     print('Sample path m=', m)
@@ -214,7 +218,6 @@ for m in range(0,M):
         np.savetxt(EstimateErrorFileNameTemplate.replace('[filter]',names[k]).replace('[pathnum]', str(m).zfill(int(np.log10(M)))),  EstimateError[k][m,:,:], fmt='%f')
         np.savetxt(ControlErrorFileNameTemplate.replace('[filter]',names[k]).replace('[pathnum]', str(m).zfill(int(np.log10(M)))),  ControlError[k][m,:,:], fmt='%f')
 
-
 mEstimateError = [None] * len(filters)
 stdEstimateError = [None] * len(filters)
 mControlError = [None] * len(filters)
@@ -231,4 +234,5 @@ for k in range(0, len(filters)):
     stdControlError[k] = np.std(ControlError[k], axis = 0)
     np.savetxt(ControlErrorFileNameTemplate.replace('[filter]',names[k]).replace('[pathnum]', 'mean'),  mControlError[k], fmt='%f')
     np.savetxt(ControlErrorFileNameTemplate.replace('[filter]',names[k]).replace('[pathnum]', 'std'),  stdControlError[k], fmt='%f')
+
 
