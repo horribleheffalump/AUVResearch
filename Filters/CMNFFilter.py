@@ -61,7 +61,29 @@ class CMNFFilter():
             self.HHat.append(H)
             self.hHat.append(h)
             self.KTilde.append(kTilde)
-            self.KHat.append(kHat)
+            self.KHat.append(kHat)          
+        self.FHat = np.array(self.FHat)
+        self.fHat = np.array(self.fHat)
+        self.HHat = np.array(self.HHat)
+        self.hHat = np.array(self.hHat)
+        self.KTilde = np.array(self.KTilde)
+        self.KHat = np.array(self.KHat)
+
+    def SaveParameters(self, filename_template):
+        np.save(filename_template.replace('[param]','FMultHat'), self.FHat)
+        np.save(filename_template.replace('[param]','FAddHat'), self.fHat)
+        np.save(filename_template.replace('[param]','HMultHat'), self.HHat)
+        np.save(filename_template.replace('[param]','HAddHat'), self.hHat)
+        np.save(filename_template.replace('[param]','KTilde'), self.KTilde)
+        np.save(filename_template.replace('[param]','KHat'), self.KHat)
+
+    def LoadParameters(self, filename_template):
+        self.FHat = np.load(filename_template.replace('[param]','FMultHat'))
+        self.fHat = np.load(filename_template.replace('[param]','FAddHat'))
+        self.HHat = np.load(filename_template.replace('[param]','HMultHat'))
+        self.hHat = np.load(filename_template.replace('[param]','HAddHat'))
+        self.KTilde = np.load(filename_template.replace('[param]','KTilde'))
+        self.KHat = np.load(filename_template.replace('[param]','KHat'))
 
     def Step(self, model, k, y, xHat_, kHat_):
         if (k == len(self.FHat)): ## OMG!! This is a dirty trick to make the CMNF time scale in line with Kalman filter timescale. Otherwise we need to calculate CMNF params on one additional step.

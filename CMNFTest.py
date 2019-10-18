@@ -81,16 +81,17 @@ def Zeta(auv, k, X, y):
 
 
 
-M = 1000
+M = 100
 
 X0all = np.array(list(map(lambda i: mX0 + sigmaW * np.array(np.random.normal(0,1,3)), range(0, M) )))
 auvs = np.array(list(map(lambda i: createAUV(X0all[i]), range(0, M) )))
 
 cmnf = CMNFFilter(Phi, Psi, DW, DNu, Xi, Zeta)
-cmnf.EstimateParameters(auvs, X0all, mX0, N, M)
+#cmnf.EstimateParameters(auvs, X0all, mX0, N, M)
+#cmnf.SaveParameters("D:\\Наука\\_Статьи\\__в работе\\2019 - Sensors - Navigation\\data\\[param].npy")
+cmnf.LoadParameters("D:\\Наука\\_Статьи\\__в работе\\2019 - Sensors - Navigation\\data\\[param].npy")
 
-
-M = 1000
+M = 3
 
 EstimateError = np.zeros((M,N+1,mX0.shape[0]))
 ControlError = np.zeros((M,N+1,mX0.shape[0]))
