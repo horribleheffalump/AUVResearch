@@ -6,8 +6,10 @@ from Filters.CMNFFilter import *
 from Filters.KalmanFilter import *
 from math import *
 #np.random.seed(2213123)
-TT = 150.0
-T = 150.0
+path = "Z:\\Наука - Data\\2019 - Sensors - AUV\\data\\acoustic_new\\"
+
+TT = 100.0
+T = 300.0
 delta = 1.0
 N = int(T / delta)
 
@@ -22,22 +24,19 @@ VNominal_history = np.array(list(map(lambda t: AUV.V(U(t)), t_history[:-1])))
 deltaXNominal_history = np.vstack((np.zeros(mX0.shape), delta * VNominal_history))
 XNominal_history = mX0 + np.cumsum(deltaXNominal_history, axis = 0)
 
-maxX = np.max(XNominal_history, axis = 0)
-minX = np.min(XNominal_history, axis = 0)
+#maxX = np.max(XNominal_history, axis = 0)
+#minX = np.min(XNominal_history, axis = 0)
+#Xb = np.array([[-100, 100, 0.0]])
+Xb = np.array([[500, 100, 0.0], [500, -100, 0.0], [-100.0, 100.0, 0.0], [-100.0, -100.0, 0.0]])
+#Xb = np.array([[500, 100, 0.0]])
 #Xb = np.array([[maxX[0] + 100, maxX[1] + 100, 0.0], [maxX[0] + 100, minX[1] - 100, 0.0], [minX[0] - 100, maxX[1] + 100, 0.0], [minX[0] - 100, minX[1] - 100, 0.0]])
-Xb = np.array([[maxX[0] + 100, maxX[1] + 100, 0.0]])
+#Xb = np.array([[maxX[0] + 100, maxX[1] + 100, 0.0]])
 
-sigmaNu0 = np.tan(5 * np.pi / 180.0 / 60.0) # 5 arc minutes
-#sigmaNu0 = np.tan(0.5 * np.pi / 180.0) # 0.5 degree
+#sigmaNu0 = np.tan(5 * np.pi / 180.0 / 60.0) # 5 arc minutes
+sigmaNu0 = np.tan(0.5 * np.pi / 180.0) # 0.5 degree
 sigmaNu = sigmaNu0 * np.ones(2 * Xb.shape[0])
 DNu = np.power(sigmaNu, 2.0)
 
-dX = mX0 - Xb
-pdX = dX[:,:-1]
-sign_sin_phi = np.sign(pdX[:,1] / np.linalg.norm(pdX, axis = 1))
-sign_cos_phi = np.sign(pdX[:,0] / np.linalg.norm(pdX, axis = 1))
-sign_sin_lambda = np.sign(dX[:,2] / np.linalg.norm(dX, axis = 1))
-sign_cos_lambda = np.sign(np.linalg.norm(pdX, axis = 1) / np.linalg.norm(dX, axis = 1))
 
 def tan2sin(tan):
     sin = tan / np.sqrt(1.0 + tan * tan)
@@ -47,7 +46,15 @@ def tan2cos(tan):
     cos = 1.0 / np.sqrt(1.0 + tan * tan)
     return cos
 
-def obs2sincos(y):
+def obs2sincos(y,X):
+    # we need X here just to calculate the proper signs of the sines and cosines
+    dX = X - Xb
+    pdX = dX[:,:-1]
+    sign_sin_phi = np.sign(pdX[:,1] / np.linalg.norm(pdX, axis = 1))
+    sign_cos_phi = np.sign(pdX[:,0] / np.linalg.norm(pdX, axis = 1))
+    sign_sin_lambda = np.sign(dX[:,2] / np.linalg.norm(dX, axis = 1))
+    sign_cos_lambda = np.sign(np.linalg.norm(pdX, axis = 1) / np.linalg.norm(dX, axis = 1))
+
     [tanphi, tanlambda] = np.split(y,2)
     sin_phi = np.abs(tan2sin(tanphi)) * sign_sin_phi
     cos_phi = np.abs(tan2cos(tanphi)) * sign_cos_phi
@@ -73,12 +80,12 @@ seabed = Profile()
 
 def createAUV(X0):
     auv = AUV(T, delta, X0, DW, U)
-    #for i in range(0, accuracy.size):
-    #    ph = PhiBounds[i,:]
-    #    th = ThetaBounds[i,:]
-    #    PhiGrad = np.append(np.arange(ph[0], ph[1], (ph[1] - ph[0]) / NBeams), ph[1])
-    #    ThetaGrad = np.append(np.arange(th[0], th[1], (th[1] - th[0]) / NBeams), th[1])
-    #    auv.addsensor(accuracy[i], PhiGrad / 180.0 * np.pi, ThetaGrad / 180.0 * np.pi, seabed, estimateslope = True)
+    for i in range(0, accuracy.size):
+        ph = PhiBounds[i,:]
+        th = ThetaBounds[i,:]
+        PhiGrad = np.append(np.arange(ph[0], ph[1], (ph[1] - ph[0]) / NBeams), ph[1])
+        ThetaGrad = np.append(np.arange(th[0], th[1], (th[1] - th[0]) / NBeams), th[1])
+        auv.addsensor(accuracy[i], PhiGrad / 180.0 * np.pi, ThetaGrad / 180.0 * np.pi, seabed, estimateslope = True)
     return auv
 
 def Psi1(auv, k, X, y):
@@ -99,35 +106,43 @@ def Psi2(auv, k, X, y):
     return np.eye(2 * Xb.shape[0])
 
 def Psi1Pseudo(auv,k,X,y):
-    sin_phi, cos_phi, sin_lambda, cos_lambda = obs2sincos(y)
+    sin_phi, cos_phi, sin_lambda, cos_lambda = obs2sincos(y, X)
     return np.vstack((np.array([-sin_phi, cos_phi, np.zeros(sin_phi.shape[0])]).T,np.array([-sin_lambda, np.zeros(sin_phi.shape[0]), cos_phi*cos_lambda]).T)) @ X
 
 def dPsi1Pseudo(auv,k,X,y):
-    sin_phi, cos_phi, sin_lambda, cos_lambda = obs2sincos(y)
+    sin_phi, cos_phi, sin_lambda, cos_lambda = obs2sincos(y, X)
     return np.vstack((np.array([-sin_phi, cos_phi, np.zeros(sin_phi.shape[0])]).T,np.array([-sin_lambda, np.zeros(sin_phi.shape[0]), cos_phi*cos_lambda]).T))
 
 def Psi2Pseudo(auv,k,X,y):
-    sin_phi, cos_phi, sin_lambda, cos_lambda = obs2sincos(y)
-    return np.hstack(((X0[0] - Xb[:,0]) * cos_phi, (X0[0] - Xb[:,0]) * cos_lambda));
+    sin_phi, cos_phi, sin_lambda, cos_lambda = obs2sincos(y, X)
+    return np.diag(np.hstack((
+        (X[0] - Xb[:,0]) * cos_phi,  
+        (X[0] - Xb[:,0]) * cos_lambda
+        )));
 
 
 def Angles(X):
     return Psi1([], [], X, []) + Psi2([], [], X, []) @ sigmaNu * np.array(np.random.normal(0.0,1.0, DNu.shape[0]))
 
-def PseudoMeasurements(y):
-    sin_phi, cos_phi, sin_lambda, cos_lambda = obs2sincos(y)
+def PseudoMeasurements(y, X):
+    sin_phi, cos_phi, sin_lambda, cos_lambda = obs2sincos(y, X)
     return np.hstack((Xb[:,1] * cos_phi - Xb[:,0] * sin_phi, Xb[:,2] * cos_phi*cos_lambda - Xb[:,0] * sin_lambda));
 
 
-def Phi1(auv, k, X, XHat = []):
-    if (len(XHat)) == 0:
-        XHat = X
+def Phi(auv, k, X, XHat):
+    ### state transformation in the real system
+    deltaX, _ = auv.staterecalc(k, XHat)
+    return X + deltaX
+
+
+def Phi1(auv, k, X):
+    ### state transformation for the prediction
     if (len(auv.Sensors) > 0):
         #for acoustic
         deltaX =  np.mean(list(map(lambda x: x.delta_X_estimate, auv.Sensors)), axis=0)
     else:  
         #by virtue of the system
-        deltaX, _ = auv.staterecalc(k, XHat)
+        deltaX, _ = auv.staterecalc(k, X)
     return X + deltaX
 
 def dPhi1(auv, k, X):
@@ -137,17 +152,10 @@ def Phi2(auv, k, X):
     return np.eye(mX0.shape[0])
 
 def Xi(auv, k, XHat):
-    if (len(auv.Sensors) > 0):
-        #for CMNF acoustic
-        X = XHat + np.mean(list(map(lambda x: x.delta_X_estimate, auv.Sensors)), axis=0)
-        return X
-    else:  
-        #for CMNF with predict by virtue of the system
-        return Phi1(auv, k, XHat, XHat) + Phi2(auv, k, XHat) @ sigmaW
+    return Phi1(auv, k, XHat)
 
 def Zeta(auv, k, X, y):
     return y - Psi1(auv, k, X, y) - Psi2(auv, k, X, y) @ sigmaNu
-
 
 
 Mtrain = 1000
@@ -155,32 +163,52 @@ Mtrain = 1000
 X0all = np.array(list(map(lambda i: mX0 + sigmaW * np.array(np.random.normal(0,1,3)), range(0, Mtrain) )))
 auvs = np.array(list(map(lambda i: createAUV(X0all[i]), range(0, Mtrain) )))
 
-#cmnf = CMNFFilter(Phi1, Psi1, DW, DNu, Xi, Zeta)
+#cmnf = CMNFFilter(Phi, Psi1, DW, DNu, Xi, Zeta)
 #cmnf.EstimateParameters(auvs, X0all, mX0, N, Mtrain)
-#cmnf.SaveParameters("D:\\Наука\\_Статьи\\__в работе\\2019 - Sensors - Navigation\\data\\byvirt\\_[param].npy")
-#cmnf.LoadParameters("D:\\Наука\\_Статьи\\__в работе\\2019 - Sensors - Navigation\\data\\byvirt\\_[param].npy")
+#cmnf.SaveParameters(path + "_[param].npy")
+
+#cmnf.SaveParameters(path + "_[param].npy")
+#cmnf.LoadParameters(path + "_[param].npy")
 
 kalman = KalmanFilter(Phi1, dPhi1, Phi2, Psi1, dPsi1, Psi2, np.array([0.0,0.0,0.0]), np.diag(DW), np.zeros(2 * Xb.shape[0]), np.diag(DNu))
 
 pseudo = KalmanFilter(Phi1, dPhi1, Phi2, Psi1Pseudo, dPsi1Pseudo, Psi2Pseudo, np.array([0.0,0.0,0.0]), np.diag(DW), np.zeros(2 * Xb.shape[0]), np.diag(DNu))
 
-M = 1000
+M = 10000
 
-filters = [kalman, pseudo]
+#filters = [cmnf, kalman, pseudo]
+filters = [kalman, pseudo] 
+#needsPseudoMeasurements = [False, False, True]
 needsPseudoMeasurements = [False, True]
-colors = ['red', 'green', 'blue']
-names = ['cmnf', 'kalman', 'pseudo']
 
+#names = ['cmnf', 'kalman', 'pseudo']
+names = ['kalman', 'pseudo']
+
+Path = [None] * len(filters)
 EstimateError = [None] * len(filters)
 ControlError = [None] * len(filters)
+ControlErrorNorm = [None] * len(filters)
 
-EstimateErrorFileNameTemplate = "D:\\Наука\\_Статьи\\__в работе\\2019 - Sensors - Navigation\\data\\byvirt\\estimate\\estimate_error_[filter]_[pathnum].txt"
-ControlErrorFileNameTemplate = "D:\\Наука\\_Статьи\\__в работе\\2019 - Sensors - Navigation\\data\\byvirt\\control\\control_error_[filter]_[pathnum].txt"
+#PathFileNameTemplate = "D:\\Наука\\_Статьи\\__в работе\\2019 - Sensors - Navigation\\data\\byvirt\\path\\path_[filter]_[pathnum].txt"
+#EstimateErrorFileNameTemplate = "D:\\Наука\\_Статьи\\__в работе\\2019 - Sensors - Navigation\\data\\byvirt\\estimate\\estimate_error_[filter]_[pathnum].txt"
+#ControlErrorFileNameTemplate = "D:\\Наука\\_Статьи\\__в работе\\2019 - Sensors - Navigation\\data\\byvirt\\control\\control_error_[filter]_[pathnum].txt"
+#PathFileNameTemplate = "D:\\Наука\\_Статьи\\__в работе\\2019 - Sensors - Navigation\\data\\acoustic\\path\\path_[filter]_[pathnum].txt"
+#EstimateErrorFileNameTemplate = "D:\\Наука\\_Статьи\\__в работе\\2019 - Sensors - Navigation\\data\\acoustic\\estimate\\estimate_error_[filter]_[pathnum].txt"
+#ControlErrorFileNameTemplate = "D:\\Наука\\_Статьи\\__в работе\\2019 - Sensors - Navigation\\data\\acoustic\\control\\control_error_[filter]_[pathnum].txt"
+
+PathFileNameTemplate = path + "path\\path_[filter]_[pathnum].txt"
+EstimateErrorFileNameTemplate = path + "\\estimate\\estimate_error_[filter]_[pathnum].txt"
+ControlErrorFileNameTemplate = path + "\\control\\control_error_[filter]_[pathnum].txt"
+#PathFileNameTemplate = "Z:\\Наука - Data\\2019 - Sensors - AUV\\data\\acoustic_pseudo\\path\\path_[filter]_[pathnum].txt"
+#EstimateErrorFileNameTemplate = "Z:\\Наука - Data\\2019 - Sensors - AUV\\data\\acoustic_pseudo\\estimate\\estimate_error_[filter]_[pathnum].txt"
+#ControlErrorFileNameTemplate = "Z:\\Наука - Data\\2019 - Sensors - AUV\\data\\acoustic_pseudo\\control\\control_error_[filter]_[pathnum].txt"
+
 
 for k in range(0, len(filters)):
+    Path[k] = np.zeros((M, N+1, mX0.shape[0]))
     EstimateError[k] = np.zeros((M, N+1, mX0.shape[0]))
     ControlError[k] = np.zeros((M, N+1, mX0.shape[0]))
-
+    ControlErrorNorm[k] = np.zeros((M, N+1))
 
 for m in range(0,M):
     print('Sample path m=', m)
@@ -201,7 +229,7 @@ for m in range(0,M):
             y = Angles(auvs[k].X)
             Xs[k].append(auvs[k].X)
             if needsPseudoMeasurements[k]:
-                Y = PseudoMeasurements(y)
+                Y = PseudoMeasurements(y, XHats[k][i])
                 XHat_, KHat_ = filters[k].Step(auvs[k], i+1, y, XHats[k][i], KHats[k][i], Y)
             else:
                 XHat_, KHat_ = filters[k].Step(auvs[k], i+1, y, XHats[k][i], KHats[k][i])
@@ -209,16 +237,19 @@ for m in range(0,M):
             KHats[k].append(KHat_)
         XHats[k] = np.array(XHats[k])
         Xs[k] = np.array(Xs[k])
+        Path[k][m,:,:] = Xs[k]
         EstimateError[k][m,:,:] = Xs[k] - XHats[k]
         ControlError[k][m,:,:] = Xs[k] - XNominal_history
+        ControlErrorNorm[k][m,:] = np.power(np.linalg.norm(Xs[k] - XNominal_history, axis = 1), 2)
+        np.savetxt(PathFileNameTemplate.replace('[filter]',names[k]).replace('[pathnum]', str(m).zfill(int(np.log10(M)))),  Path[k][m,:,:], fmt='%f')
         np.savetxt(EstimateErrorFileNameTemplate.replace('[filter]',names[k]).replace('[pathnum]', str(m).zfill(int(np.log10(M)))),  EstimateError[k][m,:,:], fmt='%f')
         np.savetxt(ControlErrorFileNameTemplate.replace('[filter]',names[k]).replace('[pathnum]', str(m).zfill(int(np.log10(M)))),  ControlError[k][m,:,:], fmt='%f')
-
 
 mEstimateError = [None] * len(filters)
 stdEstimateError = [None] * len(filters)
 mControlError = [None] * len(filters)
 stdControlError = [None] * len(filters)
+mControlErrorNorm = [None] * len(filters)
 
 for k in range(0, len(filters)):
     mEstimateError[k] = np.mean(EstimateError[k], axis = 0)
@@ -231,4 +262,6 @@ for k in range(0, len(filters)):
     stdControlError[k] = np.std(ControlError[k], axis = 0)
     np.savetxt(ControlErrorFileNameTemplate.replace('[filter]',names[k]).replace('[pathnum]', 'mean'),  mControlError[k], fmt='%f')
     np.savetxt(ControlErrorFileNameTemplate.replace('[filter]',names[k]).replace('[pathnum]', 'std'),  stdControlError[k], fmt='%f')
+    mControlErrorNorm[k] = np.max(np.mean(ControlErrorNorm[k], axis = 0))
+    print(names[k], mControlErrorNorm[k])
 

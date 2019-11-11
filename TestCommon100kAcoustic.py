@@ -6,8 +6,8 @@ from Filters.CMNFFilter import *
 from Filters.KalmanFilter import *
 from math import *
 #np.random.seed(2213123)
-TT = 150.0
-T = 150.0
+TT = 100.0
+T = 5.0
 delta = 1.0
 N = int(T / delta)
 
@@ -24,10 +24,10 @@ XNominal_history = mX0 + np.cumsum(deltaXNominal_history, axis = 0)
 
 maxX = np.max(XNominal_history, axis = 0)
 minX = np.min(XNominal_history, axis = 0)
-Xb = np.array([[maxX[0] + 100, maxX[1] + 100, 0.0], [maxX[0] + 100, minX[1] - 100, 0.0], [minX[0] - 100, maxX[1] + 100, 0.0], [minX[0] - 100, minX[1] - 100, 0.0]])
+Xb = np.array([[maxX[0] + 10, maxX[1] + 10, 0.0], [maxX[0] + 10, minX[1] - 10, 0.0], [minX[0] - 10, maxX[1] + 10, 0.0], [minX[0] - 10, minX[1] - 10, 0.0]])
 
-#sigmaNu0 = np.tan(5 * np.pi / 180.0 / 60.0) # 5 arc minutes
-sigmaNu0 = np.tan(0.5 * np.pi / 180.0) # 0.5 degree
+sigmaNu0 = np.tan(5 * np.pi / 180.0 / 60.0) # 5 arc minutes
+#sigmaNu0 = np.tan(0.5 * np.pi / 180.0) # 0.5 degree
 sigmaNu = sigmaNu0 * np.ones(2 * Xb.shape[0])
 DNu = np.power(sigmaNu, 2.0)
 
@@ -62,12 +62,12 @@ NBeams = 8
 #accuracy = np.array([0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1])
 #PhiBounds = np.array([[pc-pr,pc+pr],[pc-pr,pc+pr],[pc-pr,pc+pr],[pc-pr,pc+pr],[pc-pr,pc+pr],[pc-pr,pc+pr],[pc-pr,pc+pr],[pc-pr,pc+pr]])
 #ThetaBounds = np.array([[10.0+tr,10.0-tr],   [100.0+tr,100.0-tr],  [190.0+tr,190.0-tr],  [280.0+tr,280.0-tr], [55.0+tr,55.0-tr],   [145.0+tr,145.0-tr],  [235.0+tr,235.0-tr],  [325.0+tr,325.0-tr]])
-#accuracy = np.array([0.1, 0.1])
-#PhiBounds = np.array([[pc-pr,pc+pr],[pc-pr,pc+pr]])
-#ThetaBounds = np.array([[10.0+tr,10.0-tr],[100.0+tr,100.0-tr]])
-accuracy = np.array([0.1])
-PhiBounds = np.array([[pc-pr,pc+pr]])
-ThetaBounds = np.array([[10.0+tr,10.0-tr]])
+accuracy = np.array([0.1, 0.1])
+PhiBounds = np.array([[pc-pr,pc+pr],[pc-pr,pc+pr]])
+ThetaBounds = np.array([[10.0+tr,10.0-tr],[100.0+tr,100.0-tr]])
+#accuracy = np.array([0.1])
+#PhiBounds = np.array([[pc-pr,pc+pr]])
+#ThetaBounds = np.array([[10.0+tr,10.0-tr]])
 seabed = Profile()
 
 def createAUV(X0):
@@ -149,7 +149,7 @@ def Zeta(auv, k, X, y):
 
 
 
-Mtrain = 100000
+Mtrain = 1000
 
 X0all = np.array(list(map(lambda i: mX0 + sigmaW * np.array(np.random.normal(0,1,3)), range(0, Mtrain) )))
 auvs = np.array(list(map(lambda i: createAUV(X0all[i]), range(0, Mtrain) )))
@@ -163,7 +163,7 @@ kalman = KalmanFilter(Phi1, dPhi1, Phi2, Psi1, dPsi1, Psi2, np.array([0.0,0.0,0.
 
 pseudo = KalmanFilter(Phi1, dPhi1, Phi2, Psi1Pseudo, dPsi1Pseudo, Psi2Pseudo, np.array([0.0,0.0,0.0]), np.diag(DW), np.zeros(2 * Xb.shape[0]), np.diag(DNu))
 
-M = 100000
+M = 1000
 
 #filters = [cmnf, kalman, pseudo]
 #needsPseudoMeasurements = [False, False, True]

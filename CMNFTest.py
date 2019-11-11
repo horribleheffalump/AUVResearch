@@ -5,8 +5,8 @@ from ControlledModel.AUV import *
 from Filters.CMNFFilter import *
 from math import *
 #np.random.seed(2213123)
-TT = 300.0
-T = 300.0
+TT = 180.0
+T = 180.0
 delta = 1.0
 N = int(T / delta)
 
@@ -23,9 +23,10 @@ XNominal_history = mX0 + np.cumsum(deltaXNominal_history, axis = 0)
 
 maxX = np.max(XNominal_history, axis = 0)
 minX = np.min(XNominal_history, axis = 0)
-Xb = np.array([[maxX[0] + 10, maxX[1] + 10, 0.0], [maxX[0] + 10, minX[1] - 10, 0.0], [minX[0] - 10, maxX[1] + 10, 0.0], [minX[0] - 10, minX[1] - 10, 0.0]])
+Xb = np.array([[maxX[0] + 100, maxX[1] + 100, 0.0], [maxX[0] + 100, minX[1] - 100, 0.0], [minX[0] - 100, maxX[1] + 100, 0.0], [minX[0] - 100, minX[1] - 100, 0.0]])
 
-sigmaNu0 = np.tan(5 * np.pi / 180.0 / 60.0) # 5 arc minutes
+#sigmaNu0 = np.tan(5 * np.pi / 180.0 / 60.0) # 5 arc minutes
+sigmaNu0 = np.tan(0.5 * np.pi / 180.0) # 5 arc minutes
 sigmaNu = sigmaNu0 * np.ones(2 * Xb.shape[0])
 DNu = np.power(sigmaNu, 2.0)
 
@@ -47,12 +48,12 @@ seabed = Profile()
 
 def createAUV(X0):
     auv = AUV(T, delta, X0, DW, U)
-    #for i in range(0, accuracy.size):
-    #    ph = PhiBounds[i,:]
-    #    th = ThetaBounds[i,:]
-    #    PhiGrad = np.append(np.arange(ph[0], ph[1], (ph[1] - ph[0]) / NBeams), ph[1])
-    #    ThetaGrad = np.append(np.arange(th[0], th[1], (th[1] - th[0]) / NBeams), th[1])
-    #    auv.addsensor(accuracy[i], PhiGrad / 180.0 * np.pi, ThetaGrad / 180.0 * np.pi, seabed, estimateslope = True)
+    for i in range(0, accuracy.size):
+        ph = PhiBounds[i,:]
+        th = ThetaBounds[i,:]
+        PhiGrad = np.append(np.arange(ph[0], ph[1], (ph[1] - ph[0]) / NBeams), ph[1])
+        ThetaGrad = np.append(np.arange(th[0], th[1], (th[1] - th[0]) / NBeams), th[1])
+        auv.addsensor(accuracy[i], PhiGrad / 180.0 * np.pi, ThetaGrad / 180.0 * np.pi, seabed, estimateslope = True)
     return auv
 
 def Psi(auv,k,X,y):
@@ -81,17 +82,17 @@ def Zeta(auv, k, X, y):
 
 
 
-M = 100
+M = 1000
 
 X0all = np.array(list(map(lambda i: mX0 + sigmaW * np.array(np.random.normal(0,1,3)), range(0, M) )))
 auvs = np.array(list(map(lambda i: createAUV(X0all[i]), range(0, M) )))
 
 cmnf = CMNFFilter(Phi, Psi, DW, DNu, Xi, Zeta)
-#cmnf.EstimateParameters(auvs, X0all, mX0, N, M)
-#cmnf.SaveParameters("D:\\Наука\\_Статьи\\__в работе\\2019 - Sensors - Navigation\\data\\[param].npy")
-cmnf.LoadParameters("D:\\Наука\\_Статьи\\__в работе\\2019 - Sensors - Navigation\\data\\[param].npy")
+cmnf.EstimateParameters(auvs, X0all, mX0, N, M)
+cmnf.SaveParameters("D:\\Наука\\_Статьи\\__в работе\\2019 - Sensors - Navigation\\data\\acoustic_2\\[param].npy")
+#cmnf.LoadParameters("D:\\Наука\\_Статьи\\__в работе\\2019 - Sensors - Navigation\\data\\acoustic\\[param].npy")
 
-M = 3
+M = 1000
 
 EstimateError = np.zeros((M,N+1,mX0.shape[0]))
 ControlError = np.zeros((M,N+1,mX0.shape[0]))

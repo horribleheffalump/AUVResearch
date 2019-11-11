@@ -21,6 +21,304 @@ rc('text.latex',preamble=r'\usepackage[T2A]{fontenc}')
 rc('text.latex',preamble=r'\usepackage[utf8]{inputenc}')
 rc('text.latex',preamble=r'\usepackage[russian]{babel}')
 
+colors = ['red', 'blue', 'green']
+
+
+def showstats(path, t_history, mean, std, show=False): # model scheme with basic notation
+    fig = plt.figure(figsize=(10, 7), dpi=200, facecolor='w', edgecolor='k')
+    gs = gridspec.GridSpec(4, 1, height_ratios=[0.2, 1, 1, 1]) 
+    gs.update(left=0.07, bottom=0.05, right=0.99, top=0.99, wspace=0.1, hspace=0.1)   
+
+    labels_mean = ['$\mathbf{E}(\mathbf{X}_k - \hat{\mathbf{X}}_k^{CMNF})$', '$\mathbf{E}(\mathbf{X}_k - \hat{\mathbf{X}}_k^{PMKF})$', '$\mathbf{E}(\mathbf{X}_k - \hat{\mathbf{X}}_k^{EKF})$']
+    labels_std = ['$\sigma(\mathbf{X}_k - \hat{\mathbf{X}}_k^{CMNF})$', '$\sigma(\mathbf{X}_k - \hat{\mathbf{X}}_k^{PMKF})$', '$\sigma(\mathbf{X}_k - \hat{\mathbf{X}}_k^{EKF})$']
+
+    #labels_mean = ['$\mathbf{E}(\mathbf{X}_k - \hat{\mathbf{X}}_k^{CMNF})$','','']
+    #labels_std = ['','','']
+
+    ax = [None] * 3
+    for j in range(1,4):
+        i = j - 1
+        ax[i] = plt.subplot(gs[j])
+        for k in range(0, len(mean)):
+            ax[i].plot(t_history, mean[k][:,i], color = colors[k], linewidth = 1.0, alpha = 0.7, linestyle=':')
+            ax[i].plot(t_history, std[k][:,i], color = colors[k], linewidth = 2.0, alpha = 0.7)
+
+        ax[i].set_xticks([])
+
+    ax_l = plt.subplot(gs[0])
+    for k in range(0, len(mean)):
+        ax_l.plot([], [], color = colors[k], linewidth = 1.0, alpha = 0.7, linestyle=':', label = labels_mean[k])
+        ax_l.plot([], [], color = colors[k], linewidth = 2.0, alpha = 0.7, label = labels_std[k])
+    ax_l.legend(loc='lower center', ncol=len(mean), fancybox=True, bbox_to_anchor = (0.5,-0.5))
+    ax_l.set_axis_off()
+
+    ax[2].set_yticks([0, 1, 2])
+    ax[2].set_yticklabels(['0', '1', '$Z_k - \hat{Z}_k$'])
+    ax[2].set_ylim(-0.5,2.0)
+
+    ax[2].set_xticks([0, 150, 300])
+    ax[2].set_xticklabels(['0 min', 'time [mins]', '5 min'])
+
+    #ax[1].set_yticks([-1, 0, 1, 2])
+    #ax[1].set_yticklabels(['-1', '0', '1', '$Y_k - \hat{Y}_k$'])
+    #ax[1].set_ylim(-1.5,2)
+    ax[1].set_yticks([0, 1, 2])
+    ax[1].set_yticklabels(['0', '1', '$Y_k - \hat{Y}_k$'])
+    ax[1].set_ylim(-0.5,2)
+
+    #ax[0].set_yticks([-2,  0, 2, 3])
+    #ax[0].set_yticklabels(['-2', '0', '2', '$X_k - \hat{X}_k$'])
+    #ax[0].set_ylim(-3.5,3)
+    ax[0].set_yticks([0, 2, 3])
+    ax[0].set_yticklabels(['0', '2', '$X_k - \hat{X}_k$'])
+    ax[0].set_ylim(-0.5,3)
+
+    #fig.tight_layout()
+    if show:
+        plt.show()
+    else:
+        plt.savefig(path)
+
+def showstats_part(path, t_history, mean, std, show=False): # model scheme with basic notation
+    fig = plt.figure(figsize=(7, 7), dpi=200, facecolor='w', edgecolor='k')
+    gs = gridspec.GridSpec(4, 1, height_ratios=[0.3, 1, 1, 1]) 
+    gs.update(left=0.10, bottom=0.05, right=0.99, top=0.99, wspace=0.1, hspace=0.1)   
+
+    labels_mean = ['$\mathbf{E}(\mathbf{X}_k - \hat{\mathbf{X}}_k^{CMNF})$', '$\mathbf{E}(\mathbf{X}_k - \hat{\mathbf{X}}_k^{PMKF})$', '$\mathbf{E}(\mathbf{X}_k - \hat{\mathbf{X}}_k^{EKF})$']
+    labels_std = ['$\sigma(\mathbf{X}_k - \hat{\mathbf{X}}_k^{CMNF})$', '$\sigma(\mathbf{X}_k - \hat{\mathbf{X}}_k^{PMKF})$', '$\sigma(\mathbf{X}_k - \hat{\mathbf{X}}_k^{EKF})$']
+
+    #labels_mean = ['$\mathbf{E}(\mathbf{X}_k - \hat{\mathbf{X}}_k^{CMNF})$','','']
+    #labels_std = ['','','']
+
+    ax = [None] * 3
+    for j in range(1,4):
+        i = j - 1
+        ax[i] = plt.subplot(gs[j])
+        for k in range(0, len(mean)):
+            ax[i].plot(t_history, mean[k][:,i], color = colors[k], linewidth = 1.0, alpha = 0.7, linestyle=':')
+            ax[i].plot(t_history, std[k][:,i], color = colors[k], linewidth = 2.0, alpha = 0.7)
+
+        ax[i].set_xticks([])
+
+    ax_l = plt.subplot(gs[0])
+    for k in range(0, len(mean)):
+        ax_l.plot([], [], color = colors[k], linewidth = 1.0, alpha = 0.7, linestyle=':', label = labels_mean[k])
+        ax_l.plot([], [], color = colors[k], linewidth = 2.0, alpha = 0.7, label = labels_std[k])
+    ax_l.legend(loc='lower center', ncol=len(mean), fancybox=True, bbox_to_anchor = (0.5,-0.3))
+    ax_l.set_axis_off()
+
+    ax[2].set_yticks([0, 2, 4.5])
+    ax[2].set_yticklabels(['0', '2', '$Z_k - \hat{Z}_k$'])
+    ax[2].set_ylim(-1.5,4.5)
+
+    ax[2].set_xticks([0, 5, 10])
+    ax[2].set_xticklabels(['0 sec', 'time [sec]', '10 sec'])
+
+    ax[1].set_yticks([0, 2, 4.5])
+    ax[1].set_yticklabels(['0', '2', '$Y_k - \hat{Y}_k$'])
+    ax[1].set_ylim(-1.5,4.5)
+
+    ax[0].set_yticks([ 0, 2, 4.5])
+    ax[0].set_yticklabels(['0', '2', '$X_k - \hat{X}_k$'])
+    ax[0].set_ylim(-1.5,4.5)
+
+    #fig.tight_layout()
+    if show:
+        plt.show()
+    else:
+        plt.savefig(path)
+
+
+def showsample(path, t_history, nominal, error, show=False): # model scheme with basic notation
+    fig = plt.figure(figsize=(10, 7), dpi=200, facecolor='w', edgecolor='k')
+    gs = gridspec.GridSpec(4, 1, height_ratios=[0.2, 1, 1, 1]) 
+    gs.update(left=0.07, bottom=0.05, right=0.99, top=0.99, wspace=0.1, hspace=0.1)   
+
+    labels = ['$\mathbf{X}_k^{CMNF}$', '$\mathbf{X}_k^{PMKF}$', '$\mathbf{X}_k^{EKF}$']
+
+    ax = [None] * 3
+    for j in range(1,4):
+        i = j - 1
+        ax[i] = plt.subplot(gs[j])
+        ax[i].plot(t_history, nominal[:,i], color = 'black', linewidth = 4.0, alpha = 0.5)
+        for k in range(0, len(colors)):
+            ax[i].plot(t_history, nominal[:,i]+error[k][:,i], color = colors[k], linewidth = 2.0, alpha = 0.7)
+        ax[i].set_xticks([])
+
+    ax_l = plt.subplot(gs[0])
+    for k in range(0, len(colors)):
+        ax_l.plot([], [], color = colors[k], linewidth = 2.0, alpha = 0.7, label = labels[k])
+    ax_l.legend(loc='lower center', ncol=3, fancybox=True, bbox_to_anchor = (0.5,-0.4))
+    ax_l.set_axis_off()
+
+    ax[2].set_yticks([-30, -20, -10, 0, 10])
+    ax[2].set_yticklabels(['', '-20m', '-10m', '0m', '$\mathring{Z}_{k},\,Z_{k}$'])
+    ax[2].set_ylim(-30,10)
+
+    ax[2].set_xticks([0, 150, 300])
+    ax[2].set_xticklabels(['0 min', 'time [mins]', '5 min'])
+
+    ax[1].set_yticks([-40, -20, 0, 20, 40])
+    ax[1].set_yticklabels(['', '-20m', '0m', '20m', '$\mathring{Y}_{k},\,Y_{k}$'])
+    ax[1].set_ylim(-40,40)
+
+    ax[0].set_yticks([-100, 0, 200, 400, 500])
+    ax[0].set_yticklabels(['', '0m', '200m', '400m', '$\mathring{X}_{k},\,X_{k}$'])
+    ax[0].set_ylim(-100,500)
+    
+    #ax[1].set_ylabel('Nominal path $\mathring{\mathbf{X}}_{k} [m]$')
+
+
+    #fig.tight_layout()
+    if show:
+        plt.show()
+    else:
+        plt.savefig(path)
+
+def showsample3d(path, nominal, error, XB, show=False): # model scheme with basic notation
+    XB = np.array(XB)
+    fig = plt.figure(figsize=(10, 6), dpi=200)
+    ax = fig.gca(projection='3d')
+    ax.view_init(65, 57)
+    ax.set_aspect('equal')
+
+    # set good viewpoint
+    #drawPoint(ax, [1.1, 1.1, 1.1], color = 'white', s = 0)
+
+    bndX = [XB[:,0].min() - 150, XB[:,0].max() + 150]
+    bndY = [XB[:,1].min() - 50, XB[:,1].max() + 50]
+    bndZ = [-30, 5.0]
+    dX = bndX[1] - bndX[0]
+    dY = bndY[1] - bndY[0]
+    dZ = bndZ[1] - bndZ[0]
+
+    _ = ax.plot(nominal[:,0], nominal[:,1], nominal[:,2], color = 'black', linewidth = 4.0, alpha = 0.5)
+    for k in range(0, len(colors)):
+        _ = ax.plot(nominal[:error[k].shape[0],0]+error[k][:,0], nominal[:error[k].shape[0],1]+error[k][:,1], nominal[:error[k].shape[0],2]+error[k][:,2], color = colors[k], linewidth = 2.0, alpha = 0.7)
+
+    #axes
+    drawArrow(ax, [bndX[0]-dX/10.0, bndY[0]-dY/20.0, bndZ[0]-dZ/20.0], [bndX[1]+dX/20.0, bndY[0]-dY/20.0, bndZ[0]-dZ/20.0])
+    drawArrow(ax, [bndX[0]-dX/20.0, bndY[0]-dY/15.0, bndZ[0]-dZ/20.0], [bndX[0]-dX/20.0, bndY[1]+dY/10.0, bndZ[0]-dZ/20.0])
+    drawArrow(ax, [bndX[0]-dX/20.0, bndY[0]-dY/20.0, bndZ[0]-dZ/10.0], [bndX[0]-dX/20.0, bndY[0]-dY/20.0, bndZ[1]+dZ/10.0])
+    textAtPoint(ax, [bndX[1]+dX/20.0, bndY[0] + dY/20.0 , bndZ[0]], '$x$')
+    textAtPoint(ax, [bndX[0]+dX/100.0, bndY[1]+ dY/10.0, bndZ[0]], '$y$')
+    textAtPoint(ax, [bndX[0]+dX/100.0, bndY[0], bndZ[1]+dZ/10.0], '$z$')
+
+    #seabed
+    X = np.arange(bndX[0], bndX[1], dX/100)
+    Y = np.arange(bndY[0], bndY[1], dX/100)
+    X, Y = np.meshgrid(X, Y)
+    Zsb = np.random.normal(-30.0,0.2, X.shape)
+    surf = ax.plot_surface(X, Y, Zsb, cmap=cm.copper, linewidth=0, antialiased=False, alpha=0.1)
+        
+    #surface
+    Zsf = np.random.normal(0.0,0.1, X.shape)
+    surf = ax.plot_surface(X, Y, Zsf, cmap=cm.Blues, linewidth=0, antialiased=False, alpha=0.1)
+
+
+
+    ax.zaxis.set_major_locator(LinearLocator(10))
+    ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
+    ax.set_axis_off()
+    set_axes_aspect(ax, [1.0, 1.5, 15.0])
+
+    fig.tight_layout()
+    if show:
+        plt.show()
+    else:
+        plt.savefig(path)
+
+def shownominal2d(path, t_history, nominal, show=False): # model scheme with basic notation
+    fig = plt.figure(figsize=(10, 6), dpi=200, facecolor='w', edgecolor='k')
+    gs = gridspec.GridSpec(3, 1, height_ratios=[1, 1, 1])     
+    gs.update(left=0.07, bottom=0.05, right=0.99, top=0.98, wspace=0.1, hspace=0.1)   
+
+    ax = [None] * 3
+    for i in range(0,3):
+        ax[i] = plt.subplot(gs[i])
+        ax[i].plot(t_history, nominal[:,i], color = 'black', linewidth = 4.0, alpha = 0.5)
+        ax[i].set_xticks([])
+
+    ax[2].set_yticks([-13, -12, -10, -8, -7])
+    ax[2].set_yticklabels(['', '-12m', '-10m', '-8m', '$\mathring{Z}_{k}$'])
+
+    ax[2].set_xticks([0, 150, 300])
+    ax[2].set_xticklabels(['0 min', 'time [mins]', '5 min'])
+
+    ax[1].set_yticks([-20, -10, 0, 10, 20])
+    ax[1].set_yticklabels(['', '-10m', '0m', '10m', '$\mathring{Y}_{k}$'])
+
+    ax[0].set_yticks([-100, 0, 200, 400, 500])
+    ax[0].set_yticklabels(['', '0m', '200m', '400m', '$\mathring{X}_{k}$'])
+    
+    #ax[1].set_ylabel('Nominal path $\mathring{\mathbf{X}}_{k} [m]$')
+
+
+
+    #fig.tight_layout()
+    if show:
+        plt.show()
+    else:
+        plt.savefig(path)
+
+
+
+def shownominal3d(path, nominal, XB, show=False): # model scheme with basic notation
+    XB = np.array(XB)
+    fig = plt.figure(figsize=(10, 6), dpi=200)
+    ax = fig.gca(projection='3d')
+    ax.view_init(65, 57)
+    ax.set_aspect('equal')
+
+    # set good viewpoint
+    #drawPoint(ax, [1.1, 1.1, 1.1], color = 'white', s = 0)
+
+    bndX = [XB[:,0].min() - 150, XB[:,0].max() + 150]
+    bndY = [XB[:,1].min() - 50, XB[:,1].max() + 50]
+    bndZ = [-30, 5.0]
+    dX = bndX[1] - bndX[0]
+    dY = bndY[1] - bndY[0]
+    dZ = bndZ[1] - bndZ[0]
+
+
+    _ = ax.plot(nominal[:,0], nominal[:,1], nominal[:,2], color = 'black', linewidth = 4.0, alpha = 0.5)
+
+    for i in range(0, XB.shape[0]):
+        drawPoint(ax, XB[i], color = 'blue')
+
+    #axes
+    drawArrow(ax, [bndX[0]-dX/10.0, bndY[0]-dY/20.0, bndZ[0]-dZ/20.0], [bndX[1]+dX/20.0, bndY[0]-dY/20.0, bndZ[0]-dZ/20.0])
+    drawArrow(ax, [bndX[0]-dX/20.0, bndY[0]-dY/15.0, bndZ[0]-dZ/20.0], [bndX[0]-dX/20.0, bndY[1]+dY/10.0, bndZ[0]-dZ/20.0])
+    drawArrow(ax, [bndX[0]-dX/20.0, bndY[0]-dY/20.0, bndZ[0]-dZ/10.0], [bndX[0]-dX/20.0, bndY[0]-dY/20.0, bndZ[1]+dZ/10.0])
+    textAtPoint(ax, [bndX[1]+dX/20.0, bndY[0] + dY/20.0 , bndZ[0]], '$x$')
+    textAtPoint(ax, [bndX[0]+dX/100.0, bndY[1]+ dY/10.0, bndZ[0]], '$y$')
+    textAtPoint(ax, [bndX[0]+dX/100.0, bndY[0], bndZ[1]+dZ/10.0], '$z$')
+
+    #seabed
+    X = np.arange(bndX[0], bndX[1], dX/100)
+    Y = np.arange(bndY[0], bndY[1], dX/100)
+    X, Y = np.meshgrid(X, Y)
+    Zsb = np.random.normal(-30.0,0.2, X.shape)
+    surf = ax.plot_surface(X, Y, Zsb, cmap=cm.copper, linewidth=0, antialiased=False, alpha=0.1)
+        
+    #surface
+    Zsf = np.random.normal(0.0,0.1, X.shape)
+    surf = ax.plot_surface(X, Y, Zsf, cmap=cm.Blues, linewidth=0, antialiased=False, alpha=0.1)
+
+
+
+    ax.zaxis.set_major_locator(LinearLocator(10))
+    ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
+    ax.set_axis_off()
+    set_axes_aspect(ax, [1.0, 1.5, 15.0])
+
+    fig.tight_layout()
+    if show:
+        plt.show()
+    else:
+        plt.savefig(path)
+
+
 def showbearing(path, show=False): # model scheme with basic notation
     fig = plt.figure(figsize=(10, 6), dpi=200)
     ax = fig.gca(projection='3d')
@@ -69,7 +367,7 @@ def showbearing(path, show=False): # model scheme with basic notation
     sX = np.arange(-0.1, 1.1, 1.0 / 100.0)
     sY = np.arange(-0.1, 1.05, 1.0 / 100.0)
     sX, sY = np.meshgrid(sX, sY)
-    sZ = XB[2] * np.ones_like(sX)
+    sZ = XB[2] + np.random.normal(0.0, 0.005, sX.shape)
     # Plot the surface.
     surf = ax.plot_surface(sX, sY, sZ, cmap=cm.Blues, linewidth=0, antialiased=False, alpha=0.1)
     ax.text(-0.1, 0.6, XB[2], 'sea surface', (0,1,0.1))
@@ -145,7 +443,7 @@ def showsonarmodel(path, show=False): # model scheme with basic notation
     sX = np.arange(-0.1, 1.1, 1.0 / 100.0)
     sY = np.arange(-0.1, 1.05, 1.0 / 100.0)
     sX, sY = np.meshgrid(sX, sY)
-    sZ = x[2] * np.ones_like(sX)
+    sZ = x[2] + np.random.normal(0.0, 0.005, sX.shape)
     # Plot the surface.
     surf = ax.plot_surface(sX, sY, sZ, cmap=cm.copper, linewidth=0, antialiased=False, alpha=0.1)
     ax.text(-0.1, 0.6, x[2], 'seabed', (0,1,0.1))
@@ -289,15 +587,15 @@ def showmodel(path, show=False): # model scheme with basic notation
 
     #vectors
     drawArrow(ax, Xk, v)
-    textAtPoint(ax, v, '${\mathbf{V}}_k^*$', [0.0, -0.5*s, 0.0])
+    textAtPoint(ax, v, '${\mathbf{V}}_k$', [0.0, -0.5*s, 0.0])
 
     #angles
     drawArcScale(ax, Xk, XNk1, [XNk1[0], XNk1[1], Xk[2]], scale = 0.10)
-    textAtPoint(ax, Xk, '$\gamma^*_k$', [-s, s, s])
+    textAtPoint(ax, Xk, '$\gamma_k$', [-s, s, s])
 
     drawArcScale(ax, PZ(Xk), PZ(v), Y(Xk), scale = 0.30)
     drawArcScale(ax, PZ(Xk), PZ(v), Y(Xk), scale = 0.36)
-    textAtPoint(ax, PZ(Xk), '$\\theta^*_k$', [-s, 1.5*s, 1.5*s])
+    textAtPoint(ax, PZ(Xk), '$\\theta_k$', [-s, 1.5*s, 1.5*s])
 
     #axes
     drawArrow(ax, [-0.01, 0.0, 0.0], [.5, 0.0, 0.0])
