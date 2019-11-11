@@ -37,9 +37,6 @@
     <Compile Include="Filters\CMNFFilter.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="CMNFTest.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Filters\KalmanFilter.py">
       <SubType>Code</SubType>
     </Compile>
@@ -47,14 +44,10 @@
     <Compile Include="Filters\__init__.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="EKFTest.py" />
     <Compile Include="GatherStats.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="PlotStats.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="PseudoKalmanTest.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Seabed\__init__.py" />
