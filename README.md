@@ -1,7 +1,8 @@
 # NavigationResearch
+
 AUV position estimation with seabed acoustic sensing and DOA measurements (extended Kalman filter and conditionnaly minimax nonlinear filter)
 
-Setting for simulation experiments for the AUV position estimation [1]
+Setting for simulation experiments for the AUV position estimation [1] is defined in TestCommon.py
 
 The AUV dynamic model is provided in ControlledModel/AUV.py
 
