@@ -1,10 +1,11 @@
 import numpy as np
 class Profile():
-    """Defines seabead surface as a fuction of y,x coordinates""" 
-    # z = a0 + sum_i(a_i sin (2 pi i x / Px) + b_i cos (2 pi i x / Px)) + sum_j(c_i sin (2 pi i y / Py) + d_i cos (2 pi i y / Py))  
-
+    """
+    Defines seabead surface as a fuction of y,x coordinates 
+    z = a0 + sum_i(a_i sin (2 pi i x / Px) + b_i cos (2 pi i x / Px)) + sum_j(c_i sin (2 pi i y / Py) + d_i cos (2 pi i y / Py))
+    """
     def __init__(self):
-        self.a0 = -30.0
+        self.a0 = -30.0 
         self.Px = 20.0
         self.Py = 20.0
         self.a = np.random.normal(0,1,2) / [1.0, 2.0]#, 4.0, 6.0, 8.0, 10.0]

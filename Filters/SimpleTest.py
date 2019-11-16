@@ -4,6 +4,9 @@ from matplotlib import gridspec
 from Filters.KalmanFilter import *
 from math import *
 #np.random.seed(2213123)
+
+# simple test for filters
+
 T = 300.0
 delta = 1.0
 N = int(T / delta)

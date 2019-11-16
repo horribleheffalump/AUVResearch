@@ -2,6 +2,8 @@ import numpy as np
 from matplotlib.patches import FancyArrowPatch
 from mpl_toolkits.mplot3d import proj3d
 
+#tools for plotting
+
 class Arrow3D(FancyArrowPatch):
     def __init__(self, xs, ys, zs, *args, **kwargs):
         FancyArrowPatch.__init__(self, (0,0), (0,0), *args, **kwargs)
@@ -29,20 +31,25 @@ def Z(A):
 
 
 def drawPoint(ax, P, color = 'black', s=30, alpha = 1.0):
+    # draws a point at P
     P = np.array(P)
     return ax.scatter(P[0], P[1], P[2], color = color, s = s, alpha = alpha)
 
 def drawLine(ax, A, B, color = 'black', linestyle='-', linewidth=1.0, alpha = 1.0):
+    # draws a line with ends A and B
     return ax.plot([A[0], B[0]], [A[1], B[1]], [A[2], B[2]], color = color, linestyle=linestyle, linewidth=linewidth, alpha=alpha)
 
 def drawArrow(ax, A,B, color = 'black', linewidth= 1.0):
+    # draws an arrow from A to B
     deltaX = Arrow3D([A[0], B[0]], [A[1], B[1]], [A[2], B[2]], mutation_scale=10, arrowstyle="-|>", color=color, linewidth = linewidth)
     return ax.add_artist(deltaX)
 
 def textAtPoint(ax, A, string, shift = [0.0,0.0,0.0]):
+    # places string at point A with shift
     return ax.text(A[0]+shift[0], A[1]+shift[1], A[2]+shift[2], string)
 
 def cart2sphere(X: np.array):
+    # transforms Cartesian coordinates into spheric
     r = np.sqrt(X[0] * X[0] + X[1] * X[1] + X[2] * X[2])
     theta = np.arctan2(X[1], X[0]);
     gamma = np.arctan2(X[2], X[0] / np.cos(theta));
@@ -50,7 +57,7 @@ def cart2sphere(X: np.array):
 
 
 def drawArcAngles(ax, C, P, theta: float, gamma: float, N=100):
-    #ax - axes, C - center, P - point on the circle where to start the arc, theta, gamma - spheric angles (define length and direction of the arc), N - number of points on the arc
+    # draws an arc with C - center, P - point on the circle where to start the arc, theta, gamma - spheric angles (define length and direction of the arc), N - number of points on the arc
     tol = 1e-10     
     C = np.array(C)
     P = np.array(P)
@@ -74,7 +81,7 @@ def drawArcAngles(ax, C, P, theta: float, gamma: float, N=100):
 
 
 def drawArc(ax, C, P, D, N=20):
-    #ax - axes, C - center, P - point on the circle where to start the arc, D - third point defines the direction where the arc ends, N - number of points on the arc
+    # draws an arc with C - center, P - point on the circle where to start the arc, D - third point defines the direction where the arc ends, N - number of points on the arc
     C = np.array(C)
     P = np.array(P)
     D = np.array(D)
@@ -84,7 +91,9 @@ def drawArc(ax, C, P, D, N=20):
 
 
 def drawArcScale(ax, C, P, D, scale=1.0, N=100):
-    #ax - axes, C - center, P - point on the circle where to start the arc, D - third point defines the direction where the arc ends, N - number of points on the arc
+    # draws an arc with C - center, P - point on the circle where to start the arc, D - third point defines the direction where the arc ends, N - number of points on the arc, 
+    # scale defines the ratio between the original (defined by C and P) and the desired radius
+    # this function is useful for marking angles
     C = np.array(C)
     P = np.array(P)
     D = np.array(D)

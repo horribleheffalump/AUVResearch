@@ -1,26 +1,55 @@
 import numpy as np
 
 class CMNFFilter():
-    """Conditionnaly minimax nonlinear filter"""
+    """
+    Conditionnaly minimax nonlinear filter
+    for a nonlinear stchastic dicret-time model:
+    x(t) = Phi(t-1, x(t-1), xHat(t-1)) + W(t)   - state dynamics
+    y(t) = Psi(t, x(t)) + Nu(t)                 - observations
+    with t in [0, N]
+    W, N - Gaussian white noise with zero mean and covariances DW, DNu
+    Xi, Zeta - basic prediction and correction functions, 
+    in general case can be chosen as follows:
+    Xi = Phi                                    - by virtue of the system
+    Zeta = y - Psi                              - residual
+
+    if the structure functions Phi, Psi can not be defined in the 
+    inline manner or require some history, an external object may be used: Phi = Phi(model, ...), Psi = Psi(model, ...)
+    """
     def __init__(self, Phi, Psi, DW, DNu, Xi, Zeta):
-        self.Phi = Phi
-        self.Psi = Psi
-        self.DW = DW
-        self.sigmaW = np.sqrt(DW)
-        self.DNu = DNu
-        self.sigmaNu = np.sqrt(DNu)
-        self.Xi = Xi
-        self.Zeta = Zeta
-        self.tol = 1e-20
+        self.Phi = Phi                  # Nonlinear function of the state dynamics. Phi = Phi(model, t-1, x, xHat)
+        self.Psi = Psi                  # Nonlinear function of the observations. Phi = Psi(model, t, x, _) (last parameter is not used here, it is to pretend some other duck)
+        self.DW = DW                    # Covariation of the Gaussian noise in the state equation
+        self.sigmaW = np.sqrt(DW)       # Standard deviation of the Gaussian noise in state equation
+        self.DNu = DNu                  # Covariation of the Gaussian noise in the observations
+        self.sigmaNu = np.sqrt(DNu)     # Standard deviation of the Gaussian noise in the observations
+        self.Xi = Xi                    # CMNF basic predictor function. Xi = Xi(model, t, x)
+        self.Zeta = Zeta                # CMNF basic correction function. Zeta = Zeta(model, t, x, y)
+        self.tol = 1e-20                # tolerance for the matrix inverse calculation 
+
     def EstimateParameters(self, models, X0all, XHat0, N, M):
-        #M = States.shape[0] #number of samples
+        """
+        This function calculates the parameters of the CMNF with Monte-Carlo sampling: we generate a
+        bunch of sample paths and calculate the sampled covariances of the state, prediction and estimate 
+        
+        models - if the structure functions Phi, Psi can not be defined in the 
+        inline manner or require some history, an external object may be used for each path sample.
+        models parameters is a list of such objects
+        
+        X0all - array of initial conditions for the sample paths
+        
+        XHat0 - array of initial estimates
+        
+        N - time limit
+        
+        M - number of samples to generate
+        """
         self.FHat = [];
         self.fHat = [];
         self.HHat = [];
         self.hHat = [];
         self.KTilde = [];
         self.KHat = [];
-        #x = np.array(list(map(lambda i: X0, range(0, M) )))
         x = X0all
         xHat = np.array(list(map(lambda i: XHat0, range(0, M) )))
         for t in range(1, N + 1):
@@ -70,6 +99,9 @@ class CMNFFilter():
         self.KHat = np.array(self.KHat)
 
     def SaveParameters(self, filename_template):
+        """
+        Saves the CMNF parameters calculated by EstimateParameters(...) in files     
+        """
         np.save(filename_template.replace('[param]','FMultHat'), self.FHat)
         np.save(filename_template.replace('[param]','FAddHat'), self.fHat)
         np.save(filename_template.replace('[param]','HMultHat'), self.HHat)
@@ -78,6 +110,9 @@ class CMNFFilter():
         np.save(filename_template.replace('[param]','KHat'), self.KHat)
 
     def LoadParameters(self, filename_template):
+        """
+        Loads the pre-estimated CMNF parameters 
+        """
         self.FHat = np.load(filename_template.replace('[param]','FMultHat'))
         self.fHat = np.load(filename_template.replace('[param]','FAddHat'))
         self.HHat = np.load(filename_template.replace('[param]','HMultHat'))
@@ -86,12 +121,20 @@ class CMNFFilter():
         self.KHat = np.load(filename_template.replace('[param]','KHat'))
 
     def Step(self, model, k, y, xHat_, kHat_):
-        if (k == len(self.FHat)): ## OMG!! This is a dirty trick to make the CMNF time scale in line with Kalman filter timescale. Otherwise we need to calculate CMNF params on one additional step.
+        """
+        One step estimate xHat(t) = Step(model, t, y(t), xHat(t-1))
+        kHat is for compatibility, not required here
+        """
+        if (k == len(self.FHat)): 
+            # OMG!! Here comes a dirty trick to make the CMNF time scale in line with Kalman filter timescale. 
+            #  Otherwise we need to calculate CMNF params on one additional step. 
+            #  Note that this affects the quality of the estimate on the final step!!!
             k -= 1 
         xTilde = np.dot(self.FHat[k], self.Xi(model, k-1, xHat_)) + self.fHat[k]
         xHat = xTilde + np.dot(self.HHat[k], self.Zeta(model, k, xTilde, y)) + self.hHat[k]
         return xHat, self.KHat[k]
 
+    # sampled covariation of two sequences
     @staticmethod
     def COV(X,Y):
         n = X.shape[0]
