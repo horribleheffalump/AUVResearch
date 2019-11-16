@@ -51,7 +51,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Seabed\__init__.py" />
-    <Compile Include="TestCommon.py">
+    <Compile Include="TestNavigation.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="TestTracking.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Utils\DrawHelper.py">
