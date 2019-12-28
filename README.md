@@ -76,7 +76,8 @@ inline manner or require some history, an external object may be used: Phi1,2 = 
 
 ## References
 [[1]](https://www.mdpi.com/1424-8220/19/24/5520) A. Miller, B. Miller, G. Miller, On AUV Control with the Aid of Position Estimation Algorithms Based on Acoustic Seabed Sensing and DOA Measurements // Sensors 2019, 19, 5520.
-DOIL 10.3390/s19245520
+DOI: 10.3390/s19245520
+
 [[2]](https://ieeexplore.ieee.org/document/8606561)	A. Miller, B. Miller, G. Miller, AUV navigation with seabed acoustic sensing // 2018 Australian & New Zealand Control Conference (ANZCC), Melbourne, Australia, 7-8 Dec. 2018
 DOI: 10.1109/ANZCC.2018.8606561
 
