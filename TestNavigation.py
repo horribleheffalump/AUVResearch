@@ -1,12 +1,3 @@
-import matplotlib.pyplot as plt
-from matplotlib import gridspec
-
-from ControlledModel.AUV import *
-from Filters.CMNFFilter import *
-from Filters.KalmanFilter import *
-from math import *
-#np.random.seed(2213123)
-
 """
 Setting for simulation experiments for the AUV position estimation [1]
 The AUV dynamic model is provided in AUV.py
@@ -29,6 +20,15 @@ DOI: 10.1109/AUV.2018.8729708
 The CMNF filter is defined in CMNFFilter.py
 The Kalman filter is defined in KalmanFilter.py
 """
+
+import matplotlib.pyplot as plt
+from matplotlib import gridspec
+
+from ControlledModel.AUV import *
+from Filters.CMNFFilter import *
+from Filters.KalmanFilter import *
+from math import *
+#np.random.seed(2213123)
 
 
 # path to save results at 
@@ -281,7 +281,7 @@ for m in range(0,M):
     
     auvs = [None] * len(filters)    # auv model for each filter
     Xs = [None] * len(filters)      # real position for each filter
-    XHats = [None] * len(filter)    # position estimate for each filter
+    XHats = [None] * len(filters)    # position estimate for each filter
     KHats = [None] * len(filters)   # estimate error covariance (or its estimate) for each filter
 
     # do the same for every filter

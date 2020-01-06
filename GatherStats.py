@@ -1,7 +1,7 @@
 import numpy as np
 import glob
 
-doCalculateControls = True
+doCalculateControls = False
 
 #filters = ['cmnf', 'pseudo', 'kalman']
 filters = ['cmnf']
@@ -12,8 +12,8 @@ filters = ['cmnf']
 #EstimateErrorFileNameTemplate = "D:\\Наука\\_Статьи\\__в работе\\2019 - Sensors - Navigation\\data\\acoustic\\estimate\\estimate_error_[filter]_[pathnum].txt"
 #ControlErrorFileNameTemplate = "D:\\Наука\\_Статьи\\__в работе\\2019 - Sensors - Navigation\\data\\acoustic\\control\\control_error_[filter]_[pathnum].txt"
 
-EstimateErrorFileNameTemplate = "Z:\\Наука - Data\\2019 - Sensors - AUV\\data\\acoustic\\estimate\\estimate_error_[filter]_[pathnum].txt"
-ControlErrorFileNameTemplate = "Z:\\Наука - Data\\2019 - Sensors - AUV\\data\\acoustic\\control\\control_error_[filter]_[pathnum].txt"
+EstimateErrorFileNameTemplate = "Z:\\Наука - Data\\2019 - Sensors - Tracking\\data\\estimate\\estimate_error_[filter]_[pathnum].txt"
+ControlErrorFileNameTemplate = "Z:\\Наука - Data\\22019 - Sensors - Tracking\\data\\control\\control_error_[filter]_[pathnum].txt"
 
 
 EstimateError = [None] * len(filters)
@@ -34,7 +34,10 @@ for k in range(0, len(filters)):
         if EstimateError[k] is None:
             EstimateError[k] = np.zeros((len(files), data.shape[0], data.shape[1]))
         EstimateError[k][m,:,:] = data
-        if (np.max(np.linalg.norm(data, axis = 1)) > 100.0):
+
+        #if (np.max(np.linalg.norm(data, axis = 1)) > 10000.0):
+        #    print(file)
+        if (np.max(data) > 10000.0):
             print(file)
         m += 1
         if m % 1000 == 0:
@@ -68,10 +71,9 @@ if doCalculateControls:
     mControlError = [None] * len(filters)
     stdControlError = [None] * len(filters)
     mControlErrorNorm = [None] * len(filters)
-
-for k in range(0, len(filters)):
-    mControlErrorNorm[k] = np.max(np.mean(ControlErrorNorm[k], axis = 0))
-    print(filters[k], mControlErrorNorm[k])
+    for k in range(0, len(filters)):
+        mControlErrorNorm[k] = np.max(np.mean(ControlErrorNorm[k], axis = 0))
+        print(filters[k], mControlErrorNorm[k])
 
 
 

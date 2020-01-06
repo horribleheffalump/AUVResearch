@@ -79,6 +79,67 @@ def showstats(path, t_history, mean, std, show=False): # model scheme with basic
     else:
         plt.savefig(path)
 
+def showstats_pw(path, t_history, mean, std, show=False): # model scheme with basic notation
+    fig = plt.figure(figsize=(10, 7), dpi=200, facecolor='w', edgecolor='k')
+    gs = gridspec.GridSpec(4, 1, height_ratios=[0.2, 1, 1, 1]) 
+    gs.update(left=0.07, bottom=0.05, right=0.99, top=0.99, wspace=0.1, hspace=0.1)   
+
+    labels_mean = ['$\mathbf{E}(\mathbf{X}_k - \hat{\mathbf{X}}_k^{CMNF})$', '$\mathbf{E}(\mathbf{X}_k - \hat{\mathbf{X}}_k^{PMKF})$', '$\mathbf{E}(\mathbf{X}_k - \hat{\mathbf{X}}_k^{EKF})$']
+    labels_std = ['$\sigma(\mathbf{X}_k - \hat{\mathbf{X}}_k^{CMNF})$', '$\sigma(\mathbf{X}_k - \hat{\mathbf{X}}_k^{PMKF})$', '$\sigma(\mathbf{X}_k - \hat{\mathbf{X}}_k^{EKF})$']
+
+    #labels_mean = ['$\mathbf{E}(\mathbf{X}_k - \hat{\mathbf{X}}_k^{CMNF})$','','']
+    #labels_std = ['','','']
+
+    t_history = np.hstack((t_history[0], np.repeat(t_history[1:],2)))
+    for k in range(0, len(mean)):
+        mean[k] = np.vstack((np.repeat(mean[k][0:-1], 2, axis = 0), mean[k][-1].reshape(1, mean[k].shape[1])))
+        std[k] = np.vstack((np.repeat(std[k][0:-1], 2, axis = 0), std[k][-1].reshape(1, std[k].shape[1])))
+
+    ax = [None] * 3
+    for j in range(1,4):
+        i = j - 1
+        ax[i] = plt.subplot(gs[j])
+        for k in range(0, len(mean)):
+            ax[i].plot(t_history, mean[k][:,i], color = colors[k], linewidth = 1.0, alpha = 0.7, linestyle=':')
+            ax[i].plot(t_history, std[k][:,i], color = colors[k], linewidth = 2.0, alpha = 0.7)
+
+        ax[i].set_xticks([])
+
+    ax_l = plt.subplot(gs[0])
+    for k in range(0, len(mean)):
+        ax_l.plot([], [], color = colors[k], linewidth = 1.0, alpha = 0.7, linestyle=':', label = labels_mean[k])
+        ax_l.plot([], [], color = colors[k], linewidth = 2.0, alpha = 0.7, label = labels_std[k])
+    ax_l.legend(loc='lower center', ncol=len(mean), fancybox=True, bbox_to_anchor = (0.5,-0.5))
+    ax_l.set_axis_off()
+
+    ax[2].set_yticks([0, 1, 2])
+    ax[2].set_yticklabels(['0', '1', '$Z_k - \hat{Z}_k$'])
+    ax[2].set_ylim(-0.5,2.0)
+
+    ax[2].set_xticks([0, 150, 300])
+    ax[2].set_xticklabels(['0 min', 'time [mins]', '5 min'])
+
+    ax[1].set_yticks([-1, 0, 1, 2])
+    ax[1].set_yticklabels(['-1', '0', '1', '$Y_k - \hat{Y}_k$'])
+    ax[1].set_ylim(-1.5,2)
+    #ax[1].set_yticks([0, 1, 2])
+    #ax[1].set_yticklabels(['0', '1', '$Y_k - \hat{Y}_k$'])
+    #ax[1].set_ylim(-0.5,2)
+
+    ax[0].set_yticks([-2,  0, 2, 3])
+    ax[0].set_yticklabels(['-2', '0', '2', '$X_k - \hat{X}_k$'])
+    ax[0].set_ylim(-3.5,3)
+    #ax[0].set_yticks([0, 2, 3])
+    #ax[0].set_yticklabels(['0', '2', '$X_k - \hat{X}_k$'])
+    #ax[0].set_ylim(-0.5,3)
+
+    #fig.tight_layout()
+    if show:
+        plt.show()
+    else:
+        plt.savefig(path)
+
+
 def showstats_part(path, t_history, mean, std, show=False): # model scheme with basic notation
     fig = plt.figure(figsize=(7, 7), dpi=200, facecolor='w', edgecolor='k')
     gs = gridspec.GridSpec(4, 1, height_ratios=[0.3, 1, 1, 1]) 
@@ -128,6 +189,65 @@ def showstats_part(path, t_history, mean, std, show=False): # model scheme with 
     else:
         plt.savefig(path)
 
+def showstats_part_pw(path, t_history, mean, std, show=False): # model scheme with basic notation
+    fig = plt.figure(figsize=(7, 5), dpi=200, facecolor='w', edgecolor='k')
+    gs = gridspec.GridSpec(2, 3, height_ratios=[0.12, 1], width_ratios=[1,1,1]) 
+    gs.update(left=0.05, bottom=0.05, right=0.98, top=0.99, wspace=0.15, hspace=0.16)   
+
+    labels_mean = ['$\mathbf{E}(\mathbf{X}_k - \hat{\mathbf{X}}_k^{CMNF})$', '$\mathbf{E}(\mathbf{X}_k - \hat{\mathbf{X}}_k^{PMKF})$', '$\mathbf{E}(\mathbf{X}_k - \hat{\mathbf{X}}_k^{EKF})$']
+    labels_std = ['$\sigma(\mathbf{X}_k - \hat{\mathbf{X}}_k^{CMNF})$', '$\sigma(\mathbf{X}_k - \hat{\mathbf{X}}_k^{PMKF})$', '$\sigma(\mathbf{X}_k - \hat{\mathbf{X}}_k^{EKF})$']
+
+    #labels_mean = ['$\mathbf{E}(\mathbf{X}_k - \hat{\mathbf{X}}_k^{CMNF})$','','']
+    #labels_std = ['','','']
+
+    t_history = np.hstack((t_history[0], np.repeat(t_history[1:],2)))
+    for k in range(0, len(mean)):
+        mean[k] = np.vstack((np.repeat(mean[k][0:-1], 2, axis = 0), mean[k][-1].reshape(1, mean[k].shape[1])))
+        std[k] = np.vstack((np.repeat(std[k][0:-1], 2, axis = 0), std[k][-1].reshape(1, std[k].shape[1])))
+
+    ax = [None] * 3
+    for j in range(1,4):
+        i = j - 1
+        ax[i] = plt.subplot(gs[1,i])
+        for k in range(0, len(mean)):
+            ax[i].plot(t_history, mean[k][:,i], color = colors[k], linewidth = 1.0, alpha = 0.7, linestyle=':')
+            ax[i].plot(t_history, std[k][:,i], color = colors[k], linewidth = 2.0, alpha = 0.7)
+
+        ax[i].set_xticks([])
+
+    ax_l = plt.subplot(gs[0, :])
+    for k in range(0, len(mean)):
+        ax_l.plot([], [], color = colors[k], linewidth = 1.0, alpha = 0.7, linestyle=':', label = labels_mean[k])
+        ax_l.plot([], [], color = colors[k], linewidth = 2.0, alpha = 0.7, label = labels_std[k])
+    ax_l.legend(loc='lower center', ncol=len(mean), fancybox=True, bbox_to_anchor = (0.5,-0.3))
+    ax_l.set_axis_off()
+
+    ax[2].set_yticks([0, 5, 10])
+    ax[2].set_yticklabels(['0', '5', '10'])
+    ax[2].set_ylim(-0.5,10)
+    ax[2].set_title('$Z_k - \hat{Z}_k$')
+    ax[2].set_xticks([0, 5, 10])
+    ax[2].set_xticklabels(['0 sec', 'time [sec]', '10 sec'])
+
+    ax[1].set_yticks([0, 10, 20])
+    ax[1].set_yticklabels(['0', '10', '20'])
+    ax[1].set_ylim(-1.0,20)
+    ax[1].set_title('$Y_k - \hat{Y}_k$')
+    ax[1].set_xticks([0, 5, 10])
+    ax[1].set_xticklabels(['0 sec', 'time [sec]', '10 sec'])
+
+    ax[0].set_yticks([ 0, 30, 60])
+    ax[0].set_yticklabels(['0', '30', '60'])
+    ax[0].set_ylim(-3.0,60)
+    ax[0].set_title('$X_k - \hat{X}_k$')
+    ax[0].set_xticks([0, 5, 10])
+    ax[0].set_xticklabels(['0 sec', 'time [sec]', '10 sec'])
+    #fig.tight_layout()
+    if show:
+        plt.show()
+    else:
+        plt.savefig(path)
+
 
 def showsample(path, t_history, nominal, error, show=False): # model scheme with basic notation
     fig = plt.figure(figsize=(10, 7), dpi=200, facecolor='w', edgecolor='k')
@@ -138,7 +258,7 @@ def showsample(path, t_history, nominal, error, show=False): # model scheme with
 
     ax = [None] * 3
     for j in range(1,4):
-        i = j - 1
+        i = j - 1   
         ax[i] = plt.subplot(gs[j])
         ax[i].plot(t_history, nominal[:,i], color = 'black', linewidth = 4.0, alpha = 0.5)
         for k in range(0, len(colors)):
@@ -174,6 +294,59 @@ def showsample(path, t_history, nominal, error, show=False): # model scheme with
         plt.show()
     else:
         plt.savefig(path)
+
+
+def showsample_pw(path, t_history, nominal, error, show=False): # model scheme with basic notation
+    fig = plt.figure(figsize=(10, 7), dpi=200, facecolor='w', edgecolor='k')
+    gs = gridspec.GridSpec(4, 1, height_ratios=[0.2, 1, 1, 1]) 
+    gs.update(left=0.07, bottom=0.05, right=0.99, top=0.99, wspace=0.1, hspace=0.1)   
+
+    labels = ['$\mathbf{X}_k^{CMNF}$', '$\mathbf{X}_k^{PMKF}$', '$\mathbf{X}_k^{EKF}$']
+
+    t_history_pw = np.hstack((t_history[0], np.repeat(t_history[1:],2)))
+    nominal_pw = np.vstack((np.repeat(nominal[0:-1], 2, axis = 0), nominal[-1].reshape(1,nominal.shape[1])))
+    error_pw = [None] * len(error)
+    for k in range(0, len(colors)):
+        error_pw[k] = np.vstack((np.repeat(error[k][0:-1], 2, axis = 0), error[k][-1].reshape(1, error[k].shape[1])))
+    ax = [None] * 3
+    for j in range(1,4):
+        i = j - 1   
+        ax[i] = plt.subplot(gs[j])
+        ax[i].plot(t_history, nominal[:,i], color = 'black', linewidth = 4.0, alpha = 0.5)
+        for k in range(0, len(colors)):
+            ax[i].plot(t_history_pw, nominal_pw[:,i]+error_pw[k][:,i], color = colors[k], linewidth = 2.0, alpha = 0.7)
+        ax[i].set_xticks([])
+
+    ax_l = plt.subplot(gs[0])
+    for k in range(0, len(colors)):
+        ax_l.plot([], [], color = colors[k], linewidth = 2.0, alpha = 0.7, label = labels[k])
+    ax_l.legend(loc='lower center', ncol=3, fancybox=True, bbox_to_anchor = (0.5,-0.4))
+    ax_l.set_axis_off()
+
+    ax[2].set_yticks([-30, -20, -10, 0, 10])
+    ax[2].set_yticklabels(['', '-20m', '-10m', '0m', '$\mathring{Z}_{k},\,Z_{k}$'])
+    ax[2].set_ylim(-30,10)
+
+    ax[2].set_xticks([0, 150, 300])
+    ax[2].set_xticklabels(['0 min', 'time [mins]', '5 min'])
+
+    ax[1].set_yticks([-40, -20, 0, 20, 40])
+    ax[1].set_yticklabels(['', '-20m', '0m', '20m', '$\mathring{Y}_{k},\,Y_{k}$'])
+    ax[1].set_ylim(-40,40)
+
+    ax[0].set_yticks([-100, 0, 200, 400, 500])
+    ax[0].set_yticklabels(['', '0m', '200m', '400m', '$\mathring{X}_{k},\,X_{k}$'])
+    ax[0].set_ylim(-100,500)
+    
+    #ax[1].set_ylabel('Nominal path $\mathring{\mathbf{X}}_{k} [m]$')
+
+
+    #fig.tight_layout()
+    if show:
+        plt.show()
+    else:
+        plt.savefig(path)
+
 
 def showsample3d(path, nominal, error, XB, show=False): # model scheme with basic notation
     XB = np.array(XB)
