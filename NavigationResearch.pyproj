@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{82c268e0-cfaf-415e-aa32-7a50b3f1c66b}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>ControlledModel\drawFigures.py</StartupFile>
+    <StartupFile>TestTracking.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
