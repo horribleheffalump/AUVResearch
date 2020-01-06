@@ -34,7 +34,7 @@ class CMNFFilter():
         
         models - if the structure functions Phi, Psi can not be defined in the 
         inline manner or require some history, an external object may be used for each path sample.
-        models parameters is a list of such objects
+        models parameters is a list of such objects. Should implement step(self, XHat)
         
         X0all - array of initial conditions for the sample paths
         
@@ -51,7 +51,8 @@ class CMNFFilter():
         self.KTilde = [];
         self.KHat = [];
         x = X0all
-        xHat = np.array(list(map(lambda i: XHat0, range(0, M) )))
+        epsilon = 0.1 # regularization for the initial step (otherwise CovXiHat is zero)
+        xHat = np.array(list(map(lambda i: XHat0 + epsilon * (np.random.normal(0.0,1.0, XHat0.shape[0])), range(0, M) )))
         for t in range(1, N + 1):
             print('estimate params CMNF t=',t)
             for i in range(0, M):
@@ -60,13 +61,17 @@ class CMNFFilter():
             y = np.array(list(map(lambda i: self.Psi(models[i], t, x[i], []) + self.sigmaNu * np.array(np.random.normal(0.0,1.0, self.DNu.shape[0])), range(0, M) )))
             xiHat = np.array(list(map(lambda i : self.Xi(models[i], t-1, xHat[i]), range(0, M))))
             CovXiHat = CMNFFilter.COV(xiHat, xiHat)
-            InvCovXiHat = np.zeros_like(CovXiHat)
-            if (np.linalg.norm(CovXiHat) > self.tol):
-                InvCovXiHat = np.linalg.pinv(CovXiHat)
 
-            F = np.dot(CMNFFilter.COV(x, xiHat), InvCovXiHat)
+            #InvCovXiHatU, InvCovXiHatS, InvCovXiHatVH  = CMNFFilter.inverseSVD(CovXiHat)
+            #F = (CMNFFilter.COV(x, xiHat) @ InvCovXiHatU) 
+            #F = F @ InvCovXiHatS @ InvCovXiHatVH
+            #InvCovXiHat = InvCovXiHatU @ InvCovXiHatS @ InvCovXiHatVH
+            
+            InvCovXiHat  = CMNFFilter.inverse(CovXiHat)
+            F = CMNFFilter.COV(x, xiHat) @ InvCovXiHat 
             f = x.mean(axis=0) - np.dot(F, xiHat.mean(axis=0))
             kTilde = CMNFFilter.COV(x, x) - np.dot(F, CMNFFilter.COV(x, xiHat).T)
+
 
             xTilde = np.array(list(map(lambda i : np.dot(F, xiHat[i]) + f, range(0,M))))
             zetaTilde = np.array(list(map(lambda i : self.Zeta(models[i], t, xTilde[i], y[i]), range(0,M))))
@@ -74,13 +79,16 @@ class CMNFFilter():
             delta_by_zetaTilde = np.array(list(map(lambda i : np.outer(delta_x_xTilde[i], zetaTilde[i]), range(0,M))))
 
             CovZetaTilde = CMNFFilter.COV(zetaTilde, zetaTilde)
-            InvCovZetaTilde = np.zeros_like(CovZetaTilde)
-            if (np.linalg.norm(CovZetaTilde) > self.tol):
-                InvCovZetaTilde = np.linalg.pinv(CovZetaTilde)
 
-            delta_x = x-xTilde
-            H = np.dot(delta_by_zetaTilde.mean(axis=0), InvCovZetaTilde)
+            #InvCovZetaTildeU, InvCovZetaTildeS, InvCovZetaTildeVH = CMNFFilter.inverseSVD(CovZetaTilde)
+            #H = (delta_by_zetaTilde.mean(axis=0) @ InvCovZetaTildeU) 
+            #H = H @ InvCovZetaTildeS @ InvCovZetaTildeVH
+
+            #InvCovZetaTilde = CMNFFilter.inverse(CovZetaTilde)
+            InvCovZetaTilde = np.linalg.pinv(CovZetaTilde)
+            H = delta_by_zetaTilde.mean(axis=0) @ InvCovZetaTilde 
             h = np.dot(-H, zetaTilde.mean(axis=0))
+            delta_x = x-xTilde
             kHat = kTilde - np.dot(CMNFFilter.COV(delta_x, zetaTilde), H.T)
 
             xHat = np.array(list(map(lambda i : xTilde[i] + np.dot(H, zetaTilde[i]) + h, range(0,M))))
@@ -90,7 +98,20 @@ class CMNFFilter():
             self.HHat.append(H)
             self.hHat.append(h)
             self.KTilde.append(kTilde)
-            self.KHat.append(kHat)          
+            self.KHat.append(kHat)    
+            
+            filename_template = "Z:\\Наука - Data\\2019 - Sensors - Tracking\\data\\[param].txt"
+            np.savetxt(filename_template.replace('[param]', 'CovXiHat'), CovXiHat, fmt='%f')
+            np.savetxt(filename_template.replace('[param]', 'InvCovXiHat'), InvCovXiHat, fmt='%f')
+            np.savetxt(filename_template.replace('[param]', 'CovXiHat_by_InvCovXiHat'), CovXiHat @ InvCovXiHat, fmt='%f')
+            np.savetxt(filename_template.replace('[param]', 'InvCovXiHat_by_CovXiHat'), InvCovXiHat @ CovXiHat, fmt='%f')
+
+            #InvCovZetaTilde = InvCovZetaTildeU @ InvCovZetaTildeS @ InvCovZetaTildeVH 
+            np.savetxt(filename_template.replace('[param]', 'CovZetaTilde'), CovZetaTilde, fmt='%f')
+            np.savetxt(filename_template.replace('[param]', 'InvCovZetaTilde'), InvCovZetaTilde, fmt='%f')
+            np.savetxt(filename_template.replace('[param]', 'CovZetaTilde_by_InvCovZetaTilde'),  CovZetaTilde @ InvCovZetaTilde, fmt='%f')
+            np.savetxt(filename_template.replace('[param]', 'InvCovZetaTilde_by_CovZetaTilde'),  InvCovZetaTilde @ CovZetaTilde, fmt='%f')
+
         self.FHat = np.array(self.FHat)
         self.fHat = np.array(self.fHat)
         self.HHat = np.array(self.HHat)
@@ -132,6 +153,8 @@ class CMNFFilter():
             k -= 1 
         xTilde = np.dot(self.FHat[k], self.Xi(model, k-1, xHat_)) + self.fHat[k]
         xHat = xTilde + np.dot(self.HHat[k], self.Zeta(model, k, xTilde, y)) + self.hHat[k]
+        #if (np.linalg.norm(xHat)) > 1e10:
+        #    print("diverged")
         return xHat, self.KHat[k]
 
     # sampled covariation of two sequences
@@ -141,4 +164,20 @@ class CMNFFilter():
         cX = X - X.mean(axis=0)[np.newaxis,:] 
         cY = Y - Y.mean(axis=0)[np.newaxis,:] 
         return np.dot(cX.T, cY)/(n-1.) 
+
+    # inverse with svd decomposition
+    @staticmethod
+    def inverse(A):
+        tol = 1e-2
+        u, s, vh = np.linalg.svd(A)
+        nonzero = np.abs(s) > tol
+        inv_s = 1.0 / (s + np.invert(nonzero)) * (nonzero)
+        return u @ np.diag(inv_s) @ vh
+
+    @staticmethod
+    def inverseSVD(A):
+        u, s, vh = np.linalg.svd(A)
+        #zero = s == 0
+        inv_s = 1.0 / s #(s + zero) * np.invert(zero)
+        return u, np.diag(inv_s), vh
 
