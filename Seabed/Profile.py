@@ -1,26 +1,27 @@
 import numpy as np
 class Profile():
     """
-    Defines seabead surface as a fuction of y,x coordinates 
-    z = a0 + sum_i(a_i sin (2 pi i x / Px) + b_i cos (2 pi i x / Px)) + sum_j(c_i sin (2 pi i y / Py) + d_i cos (2 pi i y / Py))
+    Defines seabed surface as a function of y,x coordinates
+    z = a0
+        + sum_i(a_i sin (2 pi i x / Px) + b_i cos (2 pi i x / Px))
+        + sum_j(c_i sin (2 pi i y / Py) + d_i cos (2 pi i y / Py))
     """
     def __init__(self):
         self.a0 = -30.0 
         self.Px = 20.0
         self.Py = 20.0
-        self.a = np.random.normal(0,1,2) / [1.0, 2.0]#, 4.0, 6.0, 8.0, 10.0]
-        self.b = np.random.normal(0,1,2) / [1.0, 2.0]#, 4.0, 6.0, 8.0, 10.0]
-        self.c = np.random.normal(0,1,2) / [1.0, 2.0]#, 4.0, 6.0, 8.0, 10.0]
-        self.d = np.random.normal(0,1,2) / [1.0, 2.0]#, 4.0, 6.0, 8.0, 10.0]
+        self.a = np.random.normal(0,1,2) / [1.0, 2.0]  # , 4.0, 6.0, 8.0, 10.0]
+        self.b = np.random.normal(0,1,2) / [1.0, 2.0]  # , 4.0, 6.0, 8.0, 10.0]
+        self.c = np.random.normal(0,1,2) / [1.0, 2.0]  # , 4.0, 6.0, 8.0, 10.0]
+        self.d = np.random.normal(0,1,2) / [1.0, 2.0]  # , 4.0, 6.0, 8.0, 10.0]
 
         self.sin_ix_coeff = np.reshape(np.fromfunction(lambda i: 2.0 * np.pi / self.Px * i, (self.a.size,), dtype = int), (self.a.size,1))
         self.cos_ix_coeff = np.reshape(np.fromfunction(lambda i: 2.0 * np.pi / self.Px * i, (self.b.size,), dtype = int), (self.b.size,1))
         self.sin_jy_coeff = np.reshape(np.fromfunction(lambda j: 2.0 * np.pi / self.Py * j, (self.c.size,), dtype = int), (self.c.size,1))
         self.cos_jy_coeff = np.reshape(np.fromfunction(lambda j: 2.0 * np.pi / self.Py * j, (self.d.size,), dtype = int), (self.d.size,1))
 
-
     def Z(self, X, Y):      # TODO : rewrite with np.dot()
-        #return -20.0 + 0.001 * X * X - 0.002 * Y * Y - 0.3 * np.sin(2.5 * X) + 0.2 * np.cos(1.5 * Y)
+        # return -20.0 + 0.001 * X * X - 0.002 * Y * Y - 0.3 * np.sin(2.5 * X) + 0.2 * np.cos(1.5 * Y)
 
         sin_ix = np.array(list(map(lambda i: np.sin(self.sin_ix_coeff[i] * X), range(0, self.a.size))))
         cos_ix = np.array(list(map(lambda i: np.cos(self.cos_ix_coeff[i] * X), range(0, self.b.size))))
