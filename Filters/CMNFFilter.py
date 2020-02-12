@@ -27,7 +27,7 @@ class CMNFFilter():
         self.Zeta = Zeta                # CMNF basic correction function. Zeta = Zeta(model, t, x, y)
         self.tol = 1e-20                # tolerance for the matrix inverse calculation 
 
-    def EstimateParameters(self, models, X0all, XHat0, N, M):
+    def EstimateParameters(self, models, X0all, XHat0, N, M, filename_template: str):
         """
         This function calculates the parameters of the CMNF with Monte-Carlo sampling: we generate a
         bunch of sample paths and calculate the sampled covariances of the state, prediction and estimate 
@@ -43,18 +43,20 @@ class CMNFFilter():
         N - time limit
         
         M - number of samples to generate
+
+        filename_template - file template to save the filter parameters
         """
-        self.FHat = [];
-        self.fHat = [];
-        self.HHat = [];
-        self.hHat = [];
-        self.KTilde = [];
-        self.KHat = [];
+        self.FHat = []
+        self.fHat = []
+        self.HHat = []
+        self.hHat = []
+        self.KTilde = []
+        self.KHat = []
         x = X0all
         epsilon = 0.1 # regularization for the initial step (otherwise CovXiHat is zero)
-        xHat = np.array(list(map(lambda i: XHat0 + epsilon * (np.random.normal(0.0,1.0, XHat0.shape[0])), range(0, M) )))
+        xHat = np.array(list(map(lambda i: XHat0 + epsilon * (np.random.normal(0.0, 1.0, XHat0.shape[0])), range(0, M))))
         for t in range(1, N + 1):
-            print('estimate params CMNF t=',t)
+            print('estimate params CMNF t=', t)
             for i in range(0, M):
                 models[i].step(xHat[i])
             x = np.array(list(map(lambda i: self.Phi(models[i], t-1, x[i], xHat[i]) + self.sigmaW * np.array(np.random.normal(0.0,1.0, self.DW.shape[0])), range(0, M) )))
@@ -67,7 +69,7 @@ class CMNFFilter():
             #F = F @ InvCovXiHatS @ InvCovXiHatVH
             #InvCovXiHat = InvCovXiHatU @ InvCovXiHatS @ InvCovXiHatVH
             
-            InvCovXiHat  = CMNFFilter.inverse(CovXiHat)
+            InvCovXiHat = CMNFFilter.inverse(CovXiHat)
             F = CMNFFilter.COV(x, xiHat) @ InvCovXiHat 
             f = x.mean(axis=0) - np.dot(F, xiHat.mean(axis=0))
             kTilde = CMNFFilter.COV(x, x) - np.dot(F, CMNFFilter.COV(x, xiHat).T)
@@ -99,14 +101,12 @@ class CMNFFilter():
             self.hHat.append(h)
             self.KTilde.append(kTilde)
             self.KHat.append(kHat)    
-            
-            filename_template = "Z:\\Наука - Data\\2019 - Sensors - Tracking\\data\\[param].txt"
+
             np.savetxt(filename_template.replace('[param]', 'CovXiHat'), CovXiHat, fmt='%f')
             np.savetxt(filename_template.replace('[param]', 'InvCovXiHat'), InvCovXiHat, fmt='%f')
             np.savetxt(filename_template.replace('[param]', 'CovXiHat_by_InvCovXiHat'), CovXiHat @ InvCovXiHat, fmt='%f')
             np.savetxt(filename_template.replace('[param]', 'InvCovXiHat_by_CovXiHat'), InvCovXiHat @ CovXiHat, fmt='%f')
 
-            #InvCovZetaTilde = InvCovZetaTildeU @ InvCovZetaTildeS @ InvCovZetaTildeVH 
             np.savetxt(filename_template.replace('[param]', 'CovZetaTilde'), CovZetaTilde, fmt='%f')
             np.savetxt(filename_template.replace('[param]', 'InvCovZetaTilde'), InvCovZetaTilde, fmt='%f')
             np.savetxt(filename_template.replace('[param]', 'CovZetaTilde_by_InvCovZetaTilde'),  CovZetaTilde @ InvCovZetaTilde, fmt='%f')
@@ -152,10 +152,11 @@ class CMNFFilter():
             #  Note that this affects the quality of the estimate on the final step!!!
             k -= 1 
         xTilde = np.dot(self.FHat[k], self.Xi(model, k-1, xHat_)) + self.fHat[k]
-        xHat = xTilde + np.dot(self.HHat[k], self.Zeta(model, k, xTilde, y)) + self.hHat[k]
+        xCorr = np.dot(self.HHat[k], self.Zeta(model, k, xTilde, y)) + self.hHat[k]
+        xHat = xTilde + xCorr
         #if (np.linalg.norm(xHat)) > 1e10:
         #    print("diverged")
-        return xHat, self.KHat[k]
+        return xHat, self.KHat[k], xTilde, xCorr
 
     # sampled covariation of two sequences
     @staticmethod
