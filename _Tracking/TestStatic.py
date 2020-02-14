@@ -3,12 +3,11 @@ from StaticEstimates.ConditionalMeanLeastSquares import ConditionalMeanLeastSqua
 from StaticEstimates.ConditionalMeanPriorLearn import ConditionalMeanPriorLearn
 from StaticEstimates.LeastSquares import LeastSquares
 from StaticEstimates.PriorLearn import PriorLearn
-from TrackingModel import *
+from _Tracking.TrackingModel import *
 
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import MultiTaskLassoCV
 from sklearn.pipeline import make_pipeline
-from sklearn.decomposition import PCA
 
 # from sklearn.model_selection import train_test_split
 
