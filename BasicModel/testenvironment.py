@@ -298,8 +298,8 @@ class TestEnvironment():
             #else:
             plt.savefig(path + '\\' + str(t) + '.png')
 
-    def showradar(self, sonars=[]):
-        if sonars == []:
+    def showradar(self, sonars=None):
+        if sonars is None:
             sonars = range(0, len(self.auv.Sensors))
         fig = plt.figure(figsize=(10, 6), dpi=200)
         ax = fig.gca(projection='3d')

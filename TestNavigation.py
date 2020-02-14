@@ -39,10 +39,10 @@ from Filters.KalmanFilter import *
 # [TODO]: use os package, not the path+file concatenation!!!
 path = "Z:\\Наука - Data\\2019 - Sensors - AUV\\data\\acoustic_new\\"
 
-########### AUV model definition ###################
+# ########## AUV model definition ###################
 
 TT = 100.0  # defines the nominal path oscillation periods
-T = 300.0  # simulation time limit
+T = 30.0  # simulation time limit
 delta = 1.0  # simulation discretization step
 N = int(T / delta)  # number of time instants after discretization
 
@@ -71,7 +71,7 @@ Xb = np.array([[500, 100, 0.0], [500, -100, 0.0], [-100.0, 100.0, 0.0], [-100.0,
 # Xb = np.array([[maxX[0] + 100, maxX[1] + 100, 0.0]])
 
 # standard variation and the covariance matrix of the noise in observations
-# sigmaNu0 = np.tan(5 * np.pi / 180.0 / 60.0) # ~5 arc minutes
+# std_Nu0 = np.tan(5 * np.pi / 180.0 / 60.0) # ~5 arc minutes
 sigmaNu0 = np.tan(0.5 * np.pi / 180.0)  # ~0.5 degree
 sigmaNu = sigmaNu0 * np.ones(2 * Xb.shape[0])
 DNu = np.power(sigmaNu, 2.0)
@@ -163,7 +163,7 @@ def dPsi1(auv, k, X, y):
         np.power(X[0] - Xb[:, 0], 2) + np.power(X[1] - Xb[:, 1], 2), 1.5)
     d_tanlambda_dZ = 1.0 / np.sqrt(np.power(X[0] - Xb[:, 0], 2) + np.power(X[1] - Xb[:, 1], 2))
     return np.vstack((np.array([d_tanphi_dX, d_tanphi_dY, d_tanphi_dZ]).T,
-                      np.array([d_tanlambda_dX, d_tanlambda_dY, d_tanlambda_dZ]).T));
+                      np.array([d_tanlambda_dX, d_tanlambda_dY, d_tanlambda_dZ]).T))
 
 
 def Psi2(auv, k, X, y):
@@ -202,8 +202,8 @@ def Angles(X):
 def PseudoMeasurements(y, X):
     # pseudo observations
     sin_phi, cos_phi, sin_lambda, cos_lambda = obs2sincos(y, X)
-    return np.hstack(
-        (Xb[:, 1] * cos_phi - Xb[:, 0] * sin_phi, Xb[:, 2] * cos_phi * cos_lambda - Xb[:, 0] * sin_lambda));
+    return np.hstack((Xb[:, 1] * cos_phi - Xb[:, 0] * sin_phi,
+                      Xb[:, 2] * cos_phi * cos_lambda - Xb[:, 0] * sin_lambda))
 
 
 def Phi(auv, k, X, XHat):
@@ -250,9 +250,12 @@ def Zeta(auv, k, X, y):
 # cmnf = CMNFFilter(Phi, Psi1, DW, DNu, Xi, Zeta)
 
 # uncomment if parameters are estimated anew
-# Mtrain = 1000 # number of sample paths for CMNF parameters estimation (train set)
-# X0all = np.array(list(map(lambda i: mX0 + sigmaW * np.array(np.random.normal(0,1,3)), range(0, Mtrain) ))) # initial point for the training sample paths
-# auvs = np.array(list(map(lambda i: createAUV(X0all[i]), range(0, Mtrain) )))  # AUV models for the training sample paths
+# number of sample paths for CMNF parameters estimation (train set)
+# Mtrain = 1000
+# initial point for the training sample paths
+# X0all = np.array(list(map(lambda i: mX0 + std_W * np.array(np.random.normal(0,1,3)), range(0, Mtrain) )))
+# AUV models for the training sample paths
+# auvs = np.array(list(map(lambda i: createAUV(X0all[i]), range(0, Mtrain) )))
 # cmnf.EstimateParameters(auvs, X0all, mX0, N, Mtrain)
 # cmnf.SaveParameters(path + "_[param].npy")
 
@@ -285,7 +288,7 @@ needsPseudoMeasurements = [False, True]
 
 # initialization
 
-Path = [None] * len(filters)  # array to store path samples
+Path = []  # array to store path samples
 EstimateError = [None] * len(filters)  # array to store position estimation error samples
 ControlError = [None] * len(filters)  # array to store the differences between the nominal and actual positions
 ControlErrorNorm = [None] * len(filters)  # array to store the distance between the nominal and actual positions
@@ -295,7 +298,7 @@ EstimateErrorFileNameTemplate = path + "\\estimate\\estimate_error_[filter]_[pat
 ControlErrorFileNameTemplate = path + "\\control\\control_error_[filter]_[pathnum].txt"
 
 for k in range(0, len(filters)):
-    Path[k] = np.zeros((M, N + 1, mX0.shape[0]))
+    Path.append(np.zeros((M, N + 1, mX0.shape[0])))
     EstimateError[k] = np.zeros((M, N + 1, mX0.shape[0]))
     ControlError[k] = np.zeros((M, N + 1, mX0.shape[0]))
     ControlErrorNorm[k] = np.zeros((M, N + 1))

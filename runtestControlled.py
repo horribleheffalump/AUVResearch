@@ -1,5 +1,6 @@
-from ControlledModel.TestEnvironment import *
+#from ControlledModel.TestEnvironment import *
 from ControlledModel.AUV import *
+from ControlledModel.testenvironment import TestEnvironment
 from Utils.SlopeApproximator import *
 #np.random.seed(2213123)
 
