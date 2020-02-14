@@ -1,4 +1,5 @@
 # NavigationResearch
+./Navigation
 
 AUV position estimation with seabed acoustic sensing and DOA measurements (extended Kalman filter and conditionnaly minimax nonlinear filter)
 
@@ -17,6 +18,8 @@ The prediction of all tree filters may be defined
 - by virtue of the system (== the actual AUV speed is known)
 - by means of acoustic seabed sensing algorithm from [2,3] (== external speed predictor)
 
+# TrackingResearch
+./Tracking
 
 ## Conditionnaly minimax nonlinear filter Python implementation
 
@@ -83,3 +86,5 @@ DOI: 10.1109/ANZCC.2018.8606561
 
 [[3]](https://ieeexplore.ieee.org/document/8729708) A. Miller, B. Miller, G. Miller, AUV position estimation via acoustic seabed profile measurements // 2018 IEEE/OES Autonomous Underwater Vehicle Symposium - AUV 2018, University of Porto, Porto, Portugal, 6-9 Nov. 2018
 DOI: 10.1109/AUV.2018.8729708
+
+[[4]]() Tracking unpublished
