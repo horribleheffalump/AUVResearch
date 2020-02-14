@@ -44,8 +44,10 @@ def drawArrow(ax, A,B, color = 'black', linewidth= 1.0):
     deltaX = Arrow3D([A[0], B[0]], [A[1], B[1]], [A[2], B[2]], mutation_scale=10, arrowstyle="-|>", color=color, linewidth = linewidth)
     return ax.add_artist(deltaX)
 
-def textAtPoint(ax, A, string, shift = [0.0,0.0,0.0]):
+def textAtPoint(ax, A, string, shift=None):
     # places string at point A with shift
+    if shift is None:
+        shift = [0.0, 0.0, 0.0]
     return ax.text(A[0]+shift[0], A[1]+shift[1], A[2]+shift[2], string)
 
 def cart2sphere(X: np.array):
@@ -104,8 +106,10 @@ def drawArcScale(ax, C, P, D, scale=1.0, N=100):
 
 
 
-def set_axes_aspect(ax, aspect = [1.0,1.0,1.0]):
+def set_axes_aspect(ax, aspect=None):
     #Adjust the aspect of the axes. Default [1,1,1] makes the equal scale
+    if aspect is None:
+        aspect = [1.0, 1.0, 1.0]
     x_limits = ax.get_xlim3d()
     y_limits = ax.get_ylim3d()
     z_limits = ax.get_zlim3d()
