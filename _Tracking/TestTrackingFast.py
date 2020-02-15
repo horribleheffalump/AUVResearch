@@ -111,3 +111,25 @@ for (name, f) in filters.items():
 
     save_path(filename_template.replace('[num]', 'mean'), m_err)
     save_path(filename_template.replace('[num]', 'std'), std_err)
+
+
+### plot one
+# import matplotlib.pyplot as plt
+# dir = '2020-02-04-18-24-39'
+# n = '0000'
+# path_filename = f"Z:/Наука - Data/2019 - Sensors - Tracking/data/{dir}/trajectories/path_cmnf_{n}.txt"
+# estimate_error_filename = f"Z:/Наука - Data/2019 - Sensors - Tracking/data/{dir}/estimates/estimate_error_cmnf_{n}.txt"
+# predict_filename = f"Z:/Наука - Data/2019 - Sensors - Tracking/data/{dir}/estimates/predict_cmnf_{n}.txt"
+# correct_filename = f"Z:/Наука - Data/2019 - Sensors - Tracking/data/{dir}/estimates/correct_cmnf_{n}.txt"
+#
+# column_names = ['X', 'Y', 'Z', 'VX', 'VY', 'VZ', 'x', 'y', 'z', 'v', 'phi', 'a', 'alpha', 'beta', 'RX', 'RY', 'RZ']
+#
+# df = load_path(path_filename, column_names, {'est': estimate_error_filename, 'predict': predict_filename, 'correct': correct_filename, })
+#
+# def cols(str):
+#     postfixes = ['', '_est', '_predict','_correct']
+#     return [str + p for p in postfixes]
+#
+# for var in column_names:
+#     df[cols(var)].iloc[:].plot()
+#     plt.show()
