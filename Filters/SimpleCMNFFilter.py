@@ -33,7 +33,7 @@ class SimpleCMNFFilter():
         self.Zeta = Zeta  # CMNF basic correction function. Zeta = Zeta(model, t, x, y)
         self.tol = 1e-20  # tolerance for the matrix inverse calculation
 
-    def EstimateParameters(self, x, y, XHat0):
+    def EstimateParameters(self, x, y, XHat0, silent = False):
         """
         This function calculates the parameters of the CMNF with Monte-Carlo sampling: we generate a
         bunch of sample paths and calculate the sampled covariances of the state, prediction and estimate
@@ -67,7 +67,8 @@ class SimpleCMNFFilter():
         for t in range(0, N):
             if t % 10 == 0:
                 end = time.time()
-                print(f"estimate params CMNF t={t}, elapsed {end - start}")
+                if not silent:
+                    print(f"estimate params CMNF t={t}, elapsed {end - start}")
                 start = time.time()
 
             xiHat = np.apply_along_axis(self.Xi, 1, xHat)
@@ -99,7 +100,7 @@ class SimpleCMNFFilter():
             self.KTilde[t, :, :] = kTilde
             self.KHat[t, :, :] = kHat
 
-    def Filter(self, y, XHat0):
+    def Filter(self, y, XHat0, silent = False):
         M = y.shape[0]
         N = y.shape[1]
 
@@ -110,7 +111,8 @@ class SimpleCMNFFilter():
         for t in range(1, N):
             if t % 10 == 0:
                 end = time.time()
-                print(f"filter t={t}, elapsed {end - start}")
+                if not silent:
+                    print(f"filter t={t}, elapsed {end - start}")
                 start = time.time()
 
             xiHat = np.apply_along_axis(self.Xi, 1, xHat[:, t-1, :])
