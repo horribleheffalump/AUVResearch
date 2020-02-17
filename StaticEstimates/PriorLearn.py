@@ -17,7 +17,7 @@ class PriorLearn:
             x_train = x
             y_train = y
         else:
-            _, x_train,  _, y_train = train_test_split(x, y, test_size= self.train_size)
+            _, x_train,  _, y_train = train_test_split(x, y, test_size=self.train_size)
         if not self.already_fit:
             self.pipeline.fit(x_train, y_train)
         return
