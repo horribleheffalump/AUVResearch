@@ -106,16 +106,18 @@ class SimpleCMNFFilter():
 
         xHat = np.zeros((M, N, XHat0.shape[0]))
 
-        xHat[:, 0, :] = np.tile(XHat0, (M,1))
+        #xHat[:, 0, :] = np.tile(XHat0, (M, 1))
         start = time.time()
-        for t in range(1, N):
+        for t in range(0, N):
             if t % 10 == 0:
                 end = time.time()
                 if not silent:
                     print(f"filter t={t}, elapsed {end - start}")
                 start = time.time()
-
-            xiHat = np.apply_along_axis(self.Xi, 1, xHat[:, t-1, :])
+            if t==0:
+                xiHat = np.apply_along_axis(self.Xi, 1, np.tile(XHat0, (M, 1)))
+            else:
+                xiHat = np.apply_along_axis(self.Xi, 1, xHat[:, t-1, :])
             xTilde = np.apply_along_axis(lambda x: self.FHat[t, :, :] @ x + self.fHat[t, :], 1, xiHat)
             zetaTilde = np.array(list(map(lambda i: self.Zeta(xTilde[i, :], y[i, t, :]), range(0, M))))
             xHat[:, t, :] = xTilde + zetaTilde @ self.HHat[t, :, :].T + self.hHat[t, :]
