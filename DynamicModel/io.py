@@ -61,7 +61,7 @@ def calculate_stats(file_template, diverged_limit=float_info.max, max_paths=maxs
             m += 1
         if m % 1000 == 0:
             if not silent:
-                print('estimate done ', m, ' of ', len(files))
+                print(f'estimate done {m} of {len(files)}     {file_template}')
         if m == max_paths:
             break
     ensemble = ensemble[:m, :, :]

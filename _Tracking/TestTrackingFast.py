@@ -36,6 +36,8 @@ for p in paths:
 
 pipe_file_name = "Z:/Наука - Data/2019 - Sensors - Tracking/data/pipe.joblib"
 pipe_lasso = load(pipe_file_name)
+pipe_file_name = "Z:/Наука - Data/2019 - Sensors - Tracking/data/pipe_full_path.joblib"
+pipe_lasso_full_path = load(pipe_file_name)
 
 # ########## AUV model definition ###################
 from _Tracking.TrackingModel import *
@@ -47,27 +49,54 @@ def zeta_ml(x, y):
     X_lasso = pipe_lasso.predict([y[:2 * Xb.shape[0]]])
     return np.concatenate((y - psi(x), X_lasso[0]))
 
+def zeta_ml_fp(x, y):
+    X_lasso = pipe_lasso_full_path.predict([y[:2 * Xb.shape[0]]])
+    return np.concatenate((y - psi(x), X_lasso[0]))
+
 def zeta_ls(x, y):
-    x_ls = least_squares(lambda x_: cart2sphere(x_)[0] - y[:2 * Xb.shape[0]], x[0:3]).x
+    x_ls = least_squares(lambda x_: cart2sphere(x_)[:2 * Xb.shape[0]] - y[:2 * Xb.shape[0]], x[0:3]).x
     return np.concatenate((y - psi(x), x_ls))
+
+def zeta_ml_nodoppler(x, y):
+    X_lasso = pipe_lasso.predict([y[:2 * Xb.shape[0]]])
+    return np.concatenate(((y - psi(x))[:2 * Xb.shape[0]], X_lasso[0]))
+
+def zeta_ml_fp_nodoppler(x, y):
+    X_lasso = pipe_lasso_full_path.predict([y[:2 * Xb.shape[0]]])
+    return np.concatenate(((y - psi(x))[:2 * Xb.shape[0]], X_lasso[0]))
+
+def zeta_ls_nodoppler(x, y):
+    x_ls = least_squares(lambda x_: cart2sphere(x_)[:2 * Xb.shape[0]] - y[:2 * Xb.shape[0]], x[0:3]).x
+    return np.concatenate(((y - psi(x))[:2 * Xb.shape[0]], x_ls))
+
 
 
 cmnf_basic = SimpleCMNFFilter(phi, psi, DW, DNu, xi, zeta)
 cmnf_ls = SimpleCMNFFilter(phi, psi, DW, DNu, xi, zeta_ls)
 cmnf_ml = SimpleCMNFFilter(phi, psi, DW, DNu, xi, zeta_ml)
+cmnf_ml_fp = SimpleCMNFFilter(phi, psi, DW, DNu, xi, zeta_ml_fp)
+cmnf_ls_nodoppler = SimpleCMNFFilter(phi, psi, DW, DNu, xi, zeta_ls_nodoppler)
+cmnf_ml_nodoppler = SimpleCMNFFilter(phi, psi, DW, DNu, xi, zeta_ml_nodoppler)
+cmnf_ml_fp_nodoppler = SimpleCMNFFilter(phi, psi, DW, DNu, xi, zeta_ml_fp_nodoppler)
 
 filters = {
     'cmnf_basic': cmnf_basic,
     'cmnf_ls': cmnf_ls,
     'cmnf_ml': cmnf_ml,
+    'cmnf_ml_fp': cmnf_ml_fp,
+    'cmnf_ls_nodoppler': cmnf_ls_nodoppler,
+    'cmnf_ml_nodoppler': cmnf_ml_nodoppler,
+    'cmnf_ml_fp_nodoppler': cmnf_ml_fp_nodoppler,
 }
 
 estimator_ml = PriorLearn(pipe_lasso)
+estimator_ml_fp = PriorLearn(pipe_lasso_full_path)
 estimator_ls = LeastSquares(lambda x_, y_: cart2sphere(x_[0:3])[:2 * Xb.shape[0]] - y_[:2 * Xb.shape[0]], X0Hat[0:3])
 
 estimators = {
     "ls": estimator_ls,
     "ml": estimator_ml,
+    "ml_fp": estimator_ml_fp,
 }
 
 def filter_folder(name):
@@ -84,7 +113,7 @@ for filter_name in estimators:
     if not os.path.exists(p):
         os.makedirs(p)
 
-Mtrain = 10000  # number of sample paths for CMNF parameters estimation (train set)
+Mtrain = 100000  # number of sample paths for CMNF parameters estimation (train set)
 x, y = generate_sample_paths(Mtrain, int(T/delta))
 
 if __name__ == '__main__':
@@ -94,8 +123,8 @@ if __name__ == '__main__':
         f.SaveParameters(os.path.join(filter_folder(name), "[param].npy"))
 
 
-Mtest = 10000 # number of samples
-pack_size = 100
+Mtest = 100000 # number of samples
+pack_size = 1000
 
 
 def process_pack(pack_start, size):
@@ -134,6 +163,14 @@ if __name__ == '__main__':
     calculate_stats_estimators_templates = [os.path.join(filter_folder(name_), filename_template_estimate_error.replace('[filter]', name_)) for name_ in estimators]
     calculate_stats_templates = [os.path.join(path_trajectories, filename_template_trajectory)] + calculate_stats_filters_templates + calculate_stats_estimators_templates
 
-    for t in calculate_stats_templates:
-        print(f'stats calculation started for {t}')
-        calculate_stats(t, save=True)
+    calculate_stats_limit = partial(calculate_stats, diverged_limit=1e40, save=True)
+
+    with Pool(cpu_count()) as p:
+        p.map(calculate_stats_limit, calculate_stats_templates)
+
+    # for t in calculate_stats_templates:
+    #     print(f'stats calculation started for {t}')
+    #     calculate_stats(t, save=True)
+
+
+#cpu_count()

@@ -5,7 +5,7 @@ import numpy as np
 from numba import jit
 
 T = 100.0  # simulation time limit
-delta = 0.1  # simulation discretization step
+delta = 1.0  # simulation discretization step
 N = int(T / delta)  # number of time instants after discretization
 
 lamb = 0.01
