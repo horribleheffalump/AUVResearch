@@ -2,14 +2,15 @@ from DynamicModel.io import load_path
 import pandas as pd
 import numpy as np
 import os.path
+import openpyxl
 #'cmnf_basic',
-filters = ['cmnf_ml_fp', 'cmnf_ml', 'cmnf_ls', 'cmnf_ml_fp_nodoppler', 'cmnf_ml_nodoppler', 'cmnf_ls_nodoppler']
-filters_theor = ['cmnf_ml_fp', 'cmnf_ml', 'cmnf_ls', 'cmnf_ml_fp_nodoppler', 'cmnf_ml_nodoppler', 'cmnf_ls_nodoppler']
+filters = ['cmnf_basic', 'cmnf_ml_fp', 'cmnf_ml', 'cmnf_ls', 'cmnf_ml_fp_nodoppler', 'cmnf_ml_nodoppler', 'cmnf_ls_nodoppler']
+filters_theor = ['cmnf_basic', 'cmnf_ml_fp', 'cmnf_ml', 'cmnf_ls', 'cmnf_ml_fp_nodoppler', 'cmnf_ml_nodoppler', 'cmnf_ls_nodoppler']
 estimates = ['ml', 'ml_fp', 'ls']
 
 
 cols = ['X', 'Y', 'Z', 'VX', 'VY', 'VZ', 'x', 'y', 'z', 'v', 'phi', 'a', 'alpha', 'beta', 'RX', 'RY', 'RZ']
-dir = '//172.17.10.161/z/Наука - Data/2019 - Sensors - Tracking/data/test_all/estimates/'
+#dir = '//172.17.10.161/z/Наука - Data/2019 - Sensors - Tracking/data/test_all/estimates/'
 dir = 'Z:/Наука - Data/2019 - Sensors - Tracking/data/test/estimates/'
 
 file_template = os.path.join(dir, '<filter>/estimate_error_<filter>_std.txt')
@@ -48,34 +49,34 @@ def f_cols(col):
 
 
 filters = []
-filters_theor = ['cmnf_basic']
-estimates = []
+# filters_theor = ['cmnf_basic']
+# estimates = []
 
 alldata[all_cols('X')][:].plot()
 alldata[all_cols('Y')][:].plot()
 alldata[all_cols('Z')][:].plot()
-
-alldata[f_cols('VX')][:].plot()
-alldata[f_cols('VY')][:].plot()
-alldata[f_cols('VZ')][:].plot()
-
-alldata[f_cols('v')][:].plot()
-alldata[f_cols('phi')][:].plot()
-alldata[f_cols('a')][:].plot()
-
-alldata[f_cols('alpha')][:].plot()
-alldata[f_cols('beta')][:].plot()
-
-
-alldata[all_cols('X')][:].plot(ylim=(0,100))
-alldata[all_cols('Y')][:].plot(ylim=(0,100))
-alldata[all_cols('Z')][:].plot(ylim=(0,100))
-
-
-alldata[all_cols('X')][:].plot(ylim=(0,25),xlim=(700,1000))
-alldata[all_cols('Y')][:].plot(ylim=(0,50),xlim=(700,1000))
-alldata[all_cols('Z')][:].plot(ylim=(0,50),xlim=(700,1000))
-
-alldata[f_cols('VX')][:400].plot()
-alldata[f_cols('VY')][:400].plot()
-alldata[f_cols('VZ')][:400].plot()
+#
+# alldata[f_cols('VX')][:].plot()
+# alldata[f_cols('VY')][:].plot()
+# alldata[f_cols('VZ')][:].plot()
+#
+# alldata[f_cols('v')][:].plot()
+# alldata[f_cols('phi')][:].plot()
+# alldata[f_cols('a')][:].plot()
+#
+# alldata[f_cols('alpha')][:].plot()
+# alldata[f_cols('beta')][:].plot()
+#
+#
+# alldata[all_cols('X')][:].plot(ylim=(0,100))
+# alldata[all_cols('Y')][:].plot(ylim=(0,100))
+# alldata[all_cols('Z')][:].plot(ylim=(0,100))
+#
+#
+# alldata[all_cols('X')][:].plot(ylim=(0,25),xlim=(700,1000))
+# alldata[all_cols('Y')][:].plot(ylim=(0,50),xlim=(700,1000))
+# alldata[all_cols('Z')][:].plot(ylim=(0,50),xlim=(700,1000))
+#
+# alldata[f_cols('VX')][:400].plot()
+# alldata[f_cols('VY')][:400].plot()
+# alldata[f_cols('VZ')][:400].plot()

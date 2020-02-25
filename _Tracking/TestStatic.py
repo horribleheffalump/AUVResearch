@@ -12,12 +12,12 @@ from sklearn.pipeline import Pipeline
 from joblib import dump, load
 # from sklearn.model_selection import train_test_split
 
-Mtrain = 10000  # number of sample paths for CMNF parameters estimation (train set)
-Mtest = 10000  # number of sample paths for CMNF parameters estimation (train set)
+Mtrain = 100000  # number of sample paths for CMNF parameters estimation (train set)
+Mtest = 100000  # number of sample paths for CMNF parameters estimation (train set)
 ml_train_part = 5000/Mtrain
 
 pipe_file_name = "Z:/Наука - Data/2019 - Sensors - Tracking/data/pipe.joblib"
-do_save = True
+do_save = False
 do_load = False
 
 
@@ -26,7 +26,7 @@ def extract_features_and_variables(States, Observations):
     Y = States[:, :, :3].reshape(States.shape[0] * States.shape[1], -1)
     return X, Y
 
-#m_shift = np.array([0.0, 10000.0, -1000.0])
+#m_shift = np.array([0.0, 5000.0, -1000.0])
 
 #Xb = np.array([[-10000.0, 0.0, -25.0], [-5000.0, 2000.0, -10000.0]])
 
@@ -42,7 +42,7 @@ if do_load:
 else:
     pipe_lasso = Pipeline(steps=[
         ('polynomial', PolynomialFeatures(degree=2, interaction_only=False)),
-        ('lasso', MultiTaskLassoCV(eps=0.001, n_alphas=20, normalize=True, cv=5, n_jobs=-1, max_iter=5000))
+        ('lasso', MultiTaskLassoCV(eps=0.001, n_alphas=20, normalize=True, cv=5, n_jobs=-1, max_iter=10000))
         ])
 
 estimator_ml = PriorLearn(pipe_lasso, train_size=ml_train_part, already_fit=do_load)

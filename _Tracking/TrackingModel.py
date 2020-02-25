@@ -49,9 +49,12 @@ def toOriginalCoordinates(X, alpha, beta, R0):
     v_ = X[3]
     phi_ = X[4]
     V_ = np.array([v_ * np.cos(phi_), v_ * np.sin(phi_), 0.0])
-    A = np.array([[np.cos(beta), np.sin(alpha) * np.sin(beta), np.sin(beta) * np.cos(alpha)],
-                  [1.0, np.cos(alpha), -np.sin(alpha)],
-                  [-np.sin(beta), np.sin(alpha) * np.cos(beta), np.cos(beta) * np.cos(alpha)]])
+    # A = np.array([[np.cos(beta), np.sin(alpha) * np.sin(beta), np.sin(beta) * np.cos(alpha)],
+    #               [1.0, np.cos(alpha), -np.sin(alpha)],
+    #               [-np.sin(beta), np.sin(alpha) * np.cos(beta), np.cos(beta) * np.cos(alpha)]])
+    A = np.array([[np.cos(alpha), -np.sin(alpha) * np.cos(beta), np.sin(alpha) * np.sin(beta)],
+                  [np.sin(alpha), np.cos(alpha) * np.cos(beta), -np.cos(alpha)*np.sin(beta)],
+                  [0, np.sin(beta), np.cos(beta)]])
     return np.concatenate((A @ X_ + R0, A @ V_))
 
 
@@ -112,7 +115,7 @@ m_an0 = 0.5 * (min_an0 + max_an0)
 m_rotate = np.array([0.0, 0.0])
 std_rotate = np.array([np.pi / 36.0, np.pi / 36.0])
 
-m_shift = np.array([0.0, 20000.0, -1000.0])
+m_shift = np.array([0.0, 5000.0, -1000.0])
 std_shift = np.array([1000.0, 1000.0, 100.0])
 
 turned_coords = np.concatenate((m_x0, m_v0, m_phi0, m_an0))
