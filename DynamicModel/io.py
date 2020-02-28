@@ -37,7 +37,7 @@ def load_path(file_name_path, column_names, estimate_errors_files_dict=None):
     return df
 
 
-def calculate_stats(file_template, diverged_limit=float_info.max, max_paths=maxsize, silent=False, save=False):
+def load_stats(file_template, diverged_limit=float_info.max, max_paths=maxsize, silent=False):
     ensemble = None
     m = 0
     files = glob(file_template)
@@ -65,9 +65,16 @@ def calculate_stats(file_template, diverged_limit=float_info.max, max_paths=maxs
         if m == max_paths:
             break
     ensemble = ensemble[:m, :, :]
+    return ensemble
+
+
+def calculate_stats(file_template, diverged_limit=float_info.max, max_paths=maxsize, silent=False, save=False):
+    ensemble = load_stats(file_template, diverged_limit, max_paths, silent)
     mean = np.mean(ensemble, axis=0)
     std = np.std(ensemble, axis=0)
     if save:
+        mean_file = file_template.replace('*', 'mean')
+        std_file = file_template.replace('*', 'std')
         save_path(mean_file, mean)
         save_path(std_file, std)
     return mean, std
