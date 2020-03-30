@@ -1,11 +1,11 @@
-# NavigationResearch
-./Navigation
+# Navigation
+./_Navigation
 
 AUV position estimation with seabed acoustic sensing and DOA measurements (extended Kalman filter and conditionnaly minimax nonlinear filter)
 
-Setting for simulation experiments for the AUV position estimation [1] is defined in ./TestNavigation.py
+Setting for simulation experiments for the AUV position estimation [1] are defined in ./_Navigation/TestNavigation.py
 
-The AUV dynamic model is provided in ControlledModel/AUV.py
+The AUV dynamic model is provided in ./ControlledModel/AUV.py
 
 The estimation is made by
 - conditionnaly minimax nonlinear filter
@@ -14,16 +14,38 @@ The estimation is made by
 
 The measurements are the DOA of the acoustic signals from a set of beacons with known positions.
 
-The prediction of all tree filters may be defined 
+The prediction of all three filters may be defined 
 - by virtue of the system (== the actual AUV speed is known)
 - by means of acoustic seabed sensing algorithm from [2,3] (== external speed predictor)
 
-# TrackingResearch
-./Tracking
+# Tracking
+./_Tracking
+
+AUV position estimation with DOA and Doppler measurements (conditionnaly minimax nonlinear filter)
+
+The dynamic model of an AUV performing a coordinate turn in a random plane and the observers, which provide the direction cosines and Doppler shift measurements is available in ./_Tracking/TrackingModel.py. The simulation settings are defined in the same file. The detailed description of the model can be found in [4].
+
+The estimation in a static (AUV detection) is available in ./_Tracking/TestStatic.py. Available estimates:
+- best linear estimate (conditionally minimax estimate on DOA measurements)
+- least squares estimate given the observations of a single point
+- Lasso regression estimate
+- conditionally minimax estimate on combined DOA measurements and least squares estimate
+- conditionally minimax estimate on combined DOA measurements and Lasso regression estimate
+
+The estimation in a dynamic (AUV tracking) is avaliable ./_Tracking/TestTrackingFast.py. The version in ./_Tracking/TestTrackingSlow.py does not use precompiled prediction and correction functions and hence is much slower. Available filters/estimates:
+- least squares estimate given the observations of a single point
+- Lasso regression estimate
+- Conditionally minimax nonlinear filter given the DOA measurements only
+- Conditionally minimax nonlinear filter given the DOA and Doppler shift measurements
+- Conditionally minimax nonlinear filter given the DOA measurements plus the least square estimate 
+- Conditionally minimax nonlinear filter given the DOA measurements plus the Lasso regression estimate 
+- Conditionally minimax nonlinear filter given the DOA/Doppler measurements plus the least square estimate 
+- Conditionally minimax nonlinear filter given the DOA/Doppler measurements plus the Lasso regression estimate 
+
 
 ## Conditionnaly minimax nonlinear filter Python implementation
 
-The CMNF filter is implemented in Filters/CMNFFilter.py
+The CMNF filter is implemented in ./Filters/CMNFFilter.py 
 
 Conditionnaly minimax nonlinear filter
 for a nonlinear stchastic dicret-time model:
@@ -44,8 +66,10 @@ Zeta = y - Psi                              - residual
 if the structure functions Phi, Psi can not be defined in the 
 inline manner or require some history, an external object may be used: Phi = Phi(model, ...), Psi = Psi(model, ...)
 
+./Filters/SimpleCMNFFilter.py version is less general and may be used for faster calcultaions
+
 ## Extended Kalman filter Python implementation
-The Kalman filter is implemented in Filters/KalmanFilter.py
+The Kalman filter is implemented in ./Filters/KalmanFilter.py
 
 Extended Kalman filter
 for a nonlinear stchastic dicrete-time model:
