@@ -12,8 +12,8 @@ from sklearn.pipeline import Pipeline
 from joblib import dump, load
 # from sklearn.model_selection import train_test_split
 
-Mtrain = 100000  # number of sample paths for CMNF parameters estimation (train set)
-Mtest = 100000  # number of sample paths for CMNF parameters estimation (train set)
+Mtrain = 10000000  # number of sample paths for CMNF parameters estimation (train set)
+Mtest = 10000000  # number of sample paths for CMNF parameters estimation (train set)
 ml_train_part = 5000/Mtrain
 
 pipe_file_name = "Z:/Наука - Data/2019 - Sensors - Tracking/data/pipe.joblib"

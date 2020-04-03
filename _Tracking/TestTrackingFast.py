@@ -113,22 +113,8 @@ for filter_name in estimators:
     if not os.path.exists(p):
         os.makedirs(p)
 
-Mtrain = 100000  # number of sample paths for CMNF parameters estimation (train set)
+Mtrain = 100  # number of sample paths for CMNF parameters estimation (train set)
 x, y = generate_sample_paths(Mtrain, int(T/delta))
-
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-# for i in range(0,Mtrain):
-#     plt.plot(x[i,:,6], x[i,:,7])
-# plt.show()
-
-# fig = plt.figure(figsize=(3, 3), dpi=200)
-# ax = fig.gca(projection='3d')
-# for i in range(0,Mtrain):
-#     ax.plot(x[i,:,0], x[i,:,1], x[i,:,2])
-# ax.scatter(Xb[:,0],Xb[:,1],Xb[:,2])
-# plt.show()
-
 
 if __name__ == '__main__':
     for (name, f) in filters.items():

@@ -115,7 +115,7 @@ m_an0 = 0.5 * (min_an0 + max_an0)
 m_rotate = np.array([0.0, 0.0])
 std_rotate = np.array([np.pi / 36.0, np.pi / 36.0])
 
-m_shift = np.array([0.0, 5000.0, -1000.0])
+m_shift = np.array([0.0, 20000.0, -1000.0])
 std_shift = np.array([1000.0, 1000.0, 100.0])
 
 turned_coords = np.concatenate((m_x0, m_v0, m_phi0, m_an0))
