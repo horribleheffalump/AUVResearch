@@ -102,7 +102,7 @@ if the structure functions Phi, Psi can not be defined in the
 inline manner or require some history, an external object may be used: Phi1,2 = Phi1,2(model, ...), Psi1,2 = Psi1,2(model, ...)
 
 ## References
-[[1]](https://www.mdpi.com/1424-8220/19/24/5520) A. Miller, B. Miller, G. Miller, On AUV Control with the Aid of Position Estimation Algorithms Based on Acoustic Seabed Sensing and DOA Measurements // Sensors 2019, 19, 5520.
+[[1]](https://www.mdpi.com/1424-8220/19/24/5520) A. Miller, B. Miller, G. Miller, On AUV Control with the Aid of Position Estimation Algorithms Based on Acoustic Seabed Sensing and DOA Measurements // Sensors 2019, 19(24), 5520.
 DOI: 10.3390/s19245520
 
 [[2]](https://ieeexplore.ieee.org/document/8606561)	A. Miller, B. Miller, G. Miller, AUV navigation with seabed acoustic sensing // 2018 Australian & New Zealand Control Conference (ANZCC), Melbourne, Australia, 7-8 Dec. 2018
@@ -111,4 +111,6 @@ DOI: 10.1109/ANZCC.2018.8606561
 [[3]](https://ieeexplore.ieee.org/document/8729708) A. Miller, B. Miller, G. Miller, AUV position estimation via acoustic seabed profile measurements // 2018 IEEE/OES Autonomous Underwater Vehicle Symposium - AUV 2018, University of Porto, Porto, Portugal, 6-9 Nov. 2018
 DOI: 10.1109/AUV.2018.8729708
 
-[[4]]() Tracking unpublished
+[[4]](https://www.mdpi.com/1424-8220/20/8/2257) 49.	A. Borisov, A. Bosov, B. Miller, G. Miller, Passive Underwater Target Tracking: Conditionally Minimax Nonlinear Filtering with Bearing-Doppler Observations // Sensors 2020, 20(8), 2257.
+DOI: 10.3390/s20082257
+
